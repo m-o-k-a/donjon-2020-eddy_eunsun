@@ -1,0 +1,39 @@
+plugins {
+    id 'java'
+}
+
+plugins {
+    id 'application'
+    id "org.openjfx.javafxplugin" version "0.0.8"
+}
+
+javafx {
+    version = "11"
+    modules = [ 'javafx.controls', 'javafx.fxml' ]
+}
+
+
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = "11"
+targetCompatibility = "11"
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'http://pageperso.lif.univ-mrs.fr/~bertrand.estellon/maven'
+    }
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+    implementation 'org.info:painter:1.0'
+}
+
+mainClassName = "controller.App"
+
+
+test {
+    useJUnitPlatform()
+}
