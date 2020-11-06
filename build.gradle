@@ -1,15 +1,12 @@
 plugins {
     id 'java'
-}
-
-plugins {
     id 'application'
     id "org.openjfx.javafxplugin" version "0.0.8"
 }
 
 javafx {
     version = "11"
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
+    modules = [ 'javafx.controls', 'javafx.fxml',]
 }
 
 
@@ -36,4 +33,15 @@ mainClassName = "controller.App"
 
 test {
     useJUnitPlatform()
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs = ["src/main/java"]
+            includes = ["view/View.fxml", "view/style.css",
+                        "view/ressources/*"
+            ]
+        }
+    }
 }
