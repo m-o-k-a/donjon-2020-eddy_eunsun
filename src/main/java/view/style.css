@@ -1,0 +1,39 @@
+.button-movements {
+     -fx-background-image: url("./ressources/button-rock.jpg");
+ }
+
+.button-interact {
+    -fx-background-color: rgba(0,0,0,0);
+    -fx-background-image: url("./ressources/button-interact.png");
+ }
+
+.button-action {
+    -fx-background-color: rgba(0,0,0,0);
+}
+
+.lifebar-bottom {
+    -fx-background-color: lightgray;
+}
+
+
+.main {
+     -fx-background-image: url("./ressources/bakground.jpg");
+}
+
+.text-log {
+    -fx-background-color: rgba(0,0,0,0);
+    -fx-background-image: url("./ressources/log.jpg");
+    -fx-background-position: fixed;
+}
+
+.character-art {
+     -fx-background-image: url("./ressources/character-paladin.png");
+}
+
+.scene {
+    -fx-background-image: url("./ressources/scene-test.jpg");
+}
+
+.minimap {
+    -fx-background-color: rgba(0,0,0,0.75);
+}
