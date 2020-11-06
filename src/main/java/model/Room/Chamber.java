@@ -1,7 +1,7 @@
 package model.Room;
 
 public class Chamber implements  Room {
-    private boolean[] openedDoors;
+    public boolean[] openedDoors;
     private boolean isFinal;
     //entity list
     public boolean isVisited;
