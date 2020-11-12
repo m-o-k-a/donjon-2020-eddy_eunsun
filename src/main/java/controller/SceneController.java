@@ -3,15 +3,19 @@ package controller;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import model.DataBase.MonsterDataBase;
 import model.Dungeon.Dungeon;
 import model.Dungeon.DungeonGenerator;
 import model.Entity.EntityFactory;
+import model.Entity.Monster;
 import model.Entity.Player;
 import model.Room.Chamber;
 import model.Room.Wall;
@@ -37,6 +41,7 @@ public class SceneController implements Initializable {
     @FXML TextFlow textLogsContent;
     @FXML Pane lifebar;
     @FXML Canvas minimap;
+    @FXML ImageView spriteMonster;
 
 
     @Override
@@ -128,11 +133,28 @@ public class SceneController implements Initializable {
             drawMiniMapCell(Color.LIGHTGRAY, (int)(minimap.getWidth()/cellSize), lastPosition[0], lastPosition[1]);
             drawMiniMapCell(Color.LIME, (int)(minimap.getWidth()/cellSize), player.x, player.y);
             drawWalls(player.x, player.y);
-            actionLog = new Text("<Moved to ("+player.x+", "+player.y+")>\n"); actionLog.setStyle("-fx-font-style: italic;"); actionLog.setFill(Color.WHITE);
+            actionLog = new Text("<Moved to ("+player.x+", "+player.y+")>\n"); actionLog.setStyle("-fx-font-style: italic;");
         } catch (Exception e) {
-            actionLog = new Text("You cannot pass a wall.\n"); actionLog.setStyle("-fx-font-style: italic;"); actionLog.setFill(Color.WHITE);
+            actionLog = new Text("You cannot pass a wall.\n"); actionLog.setStyle("-fx-font-style: italic;");
         }
-        addLogs(actionLog);
+        addLogs(actionLog, Color.WHITE);
+        containsMonster(player.x, player.y);
+    }
+
+    private void containsMonster(int x, int y) {
+        Chamber chamber = (Chamber) dungeon.getRoom(x, y);
+        if(chamber.monster != null) {
+            addLogs(new Text("You face a "+chamber.monster.getName()+"\n"), Color.RED);
+            drawMonster(chamber.monster);
+        } else { spriteMonster.setImage(null); }
+    }
+
+    private void drawMonster(Monster monster) {
+        Image sprite = new Image(getClass().getResource(MonsterDataBase.getSprite(monster.type())).toExternalForm());
+        System.out.println("size sprite: "+sprite.getWidth()+" "+sprite.getHeight());
+        spriteMonster.setX(Math.sqrt(sprite.getHeight()+sprite.getWidth())/2);
+        spriteMonster.setX(Math.sqrt(sprite.getHeight()+sprite.getWidth())/2);
+        spriteMonster.setImage(sprite);
     }
 
     private void drawWalls(int x, int y) {
@@ -149,23 +171,24 @@ public class SceneController implements Initializable {
      * method that will add an action log dedicated to interaction
      */
     private void actionInteract() {
-        Text actionLog = new Text("<You are alone... Forever alone...>\n"); actionLog.setFill(Color.WHITE);
-        addLogs(actionLog);
+        Text actionLog = new Text("<You are alone... Forever alone...>\n");
+        addLogs(actionLog, Color.WHITE);
     }
 
     /**
      * method that will add an action log dedicated to attack
      */
     private void actionAttack() {
-        Text actionLog = new Text("You Attacked nothing\n"); actionLog.setFill(Color.RED);
-        addLogs(actionLog);
+        Text actionLog = new Text("You Attacked nothing\n");
+        addLogs(actionLog, Color.RED);
     }
 
     /**
      * method that will add a log to the textFlow textLogsContent of the interface
      * @param log
      */
-    private void addLogs(Text log) {
+    private void addLogs(Text log, Color color) {
+        log.setFill(color);
         textLogsContent.getChildren().add(0, log);
     }
 }
