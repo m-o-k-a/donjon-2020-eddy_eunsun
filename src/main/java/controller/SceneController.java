@@ -9,13 +9,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import model.DungeonGenerator;
-import model.Player;
+import model.Dungeon.Dungeon;
+import model.Dungeon.DungeonGenerator;
+import model.Entity.EntityFactory;
+import model.Entity.Player;
 import model.Room.Chamber;
-import model.Room.Room;
 import model.Room.Wall;
 
-import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.Random;
 import java.util.ResourceBundle;
@@ -26,9 +26,10 @@ public class SceneController implements Initializable {
         UP, DOWN, LEFT, RIGHT, INTERACT, ATTACK, ITEM, MAGIC
     }
 
+    EntityFactory entityFactory = new EntityFactory();
     Random random = new Random();
     DungeonGenerator dungeonGenerator = new DungeonGenerator();
-    Room[][] dungeon;
+    Dungeon dungeon;
     Player player;
     Rectangle playerLife;
     int cellSize;
@@ -41,18 +42,19 @@ public class SceneController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         //todo initialize dungeon
-        cellSize = 20;
-        dungeon = dungeonGenerator.generate(cellSize);
+        cellSize = 20; //pls do not go above 50
+        dungeon = new Dungeon(dungeonGenerator.generate(cellSize));
 
         //todo character
         Integer[] position = startingPosition(cellSize);
-        player = new Player(position[0], position[1], 100);
+        player = entityFactory.createPlayer(position[0], position[1], 100, 10, "Warrior");
         drawWalls(player.x, player.y);
 
         //todo refractor battle controller
         playerLife = new Rectangle(lifebar.getPrefWidth(), lifebar.getPrefHeight(), Color.LIME);
         lifebar.getChildren().add(playerLife);
-        drawMiniMap(cellSize);
+        drawMiniMap(cellSize, dungeon);
+        drawWalls(player.x, player.y);
     }
 
     private Integer[] startingPosition(int cellSize) {
@@ -60,17 +62,17 @@ public class SceneController implements Initializable {
         int x; int y;
         do {
             x = random.nextInt(cellSize); y = random.nextInt(cellSize);
-        } while(dungeon[x][y] != null && (dungeon[x][y] instanceof Wall));
+        } while(dungeon.getRoom(x, y) != null && (dungeon.getRoom(x, y) instanceof Wall));
         position[0] = x; position[1] = y;
         return position;
     }
 
-    private void drawMiniMap(int roomSize) {
+    private void drawMiniMap(int roomSize, Dungeon dungeon) {
         Color color = Color.BLACK;
         int cellSize = (int) (minimap.getWidth()/roomSize);
         for(int width = 0; width<roomSize; width++) {
             for(int height = 0; height<roomSize; height++) {
-                if(dungeon[width][height] instanceof Chamber) {
+                if(dungeon.getRoom(width, height) instanceof Chamber) {
                         if(player.x == width && player.y == height) { color = Color.LIME; }
                         else { color = Color.BLACK; }
                 }
@@ -85,8 +87,11 @@ public class SceneController implements Initializable {
     }
 
     //todo refractor battle controller
+
+    //TODO REGLER LE SOUCIS DES MURS
+
     private void drawLifeBar() {
-        playerLife.setWidth((lifebar.getPrefWidth()*player.getLifePoint())/100);
+        playerLife.setWidth((lifebar.getPrefWidth()*player.getHealth())/100);
     }
 
     /**
@@ -116,7 +121,7 @@ public class SceneController implements Initializable {
                 case RIGHT: player.goRight(); break;
                 default: return;
             }
-            if (dungeon[player.x][player.y] instanceof Wall) {
+            if (dungeon.getRoom(player.x, player.y) instanceof Wall) {
                 player.x = lastPosition[0]; player.y = lastPosition[1];
                 throw new Exception();
             }
@@ -131,13 +136,13 @@ public class SceneController implements Initializable {
     }
 
     private void drawWalls(int x, int y) {
-        Chamber chamber = (Chamber) dungeon[x][y];
-        System.out.println("WALLS: "+chamber.openedDoors[0]+" "+chamber.openedDoors[1]+" "+chamber.openedDoors[2]+" "+chamber.openedDoors[3]);
+        //todo remove openeddoors
+        Chamber chamber = (Chamber) dungeon.getRoom(x, y);
         //LEFT UP RIGHT DOWN
-        if(!chamber.openedDoors[0]) { drawMiniMapCell(Color.DARKGRAY, (int)(minimap.getWidth()/cellSize), x-1, y);}
-        if(!chamber.openedDoors[1]) { drawMiniMapCell(Color.DARKGRAY, (int)(minimap.getWidth()/cellSize), x, y-1);}
-        if(!chamber.openedDoors[2]) { drawMiniMapCell(Color.DARKGRAY, (int)(minimap.getWidth()/cellSize), x+1, y);}
-        if(!chamber.openedDoors[3]) { drawMiniMapCell(Color.DARKGRAY, (int)(minimap.getWidth()/cellSize), x, y+1);}
+        if(dungeon.getRoom(player.x-1, player.y) instanceof Wall) { drawMiniMapCell(Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x-1, y);}
+        if(dungeon.getRoom(player.x, player.y-1) instanceof Wall) { drawMiniMapCell(Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x, y-1);}
+        if(dungeon.getRoom(player.x+1, player.y) instanceof Wall) { drawMiniMapCell(Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x+1, y);}
+        if(dungeon.getRoom(player.x, player.y+1) instanceof Wall) { drawMiniMapCell(Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x, y+1);}
     }
 
     /**

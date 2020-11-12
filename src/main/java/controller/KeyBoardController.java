@@ -1,9 +1,7 @@
 package controller;
 
-import model.Player;
 //import view.ConsoleView;
 
-import java.util.Scanner;
 
 public class KeyBoardController {
 /*

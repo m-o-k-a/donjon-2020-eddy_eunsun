@@ -1,4 +1,4 @@
-package model;
+package model.Dungeon;
 
 import model.Room.Chamber;
 import model.Room.Room;
