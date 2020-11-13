@@ -54,7 +54,7 @@ public class SceneController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         //todo initialize dungeon
-        cellSize = 20; //pls do not go above 50
+        cellSize = 40; //pls do not go above 50
         dungeon = new Dungeon(dungeonGenerator.generate(cellSize));
 
         //todo character

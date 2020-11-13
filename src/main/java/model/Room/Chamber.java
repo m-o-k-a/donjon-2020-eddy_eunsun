@@ -28,7 +28,7 @@ public class Chamber implements  Room {
 
     private void fillChamber() {
         if(isFinal) return;
-        if(random.nextInt(101)%1000 == 0) {
+        if(random.nextInt(101)%5 == 0) {
             //todo generate lot of possibilities
             MonsterDataBase.monsters newMonster = MonsterDataBase.getRandomMonster();
             monster = entityFactory.createMonster(newMonster, random.nextInt(200), random.nextInt(20), newMonster.toString());
