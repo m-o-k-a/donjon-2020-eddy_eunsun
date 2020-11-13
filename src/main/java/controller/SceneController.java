@@ -151,9 +151,6 @@ public class SceneController implements Initializable {
 
     private void drawMonster(Monster monster) {
         Image sprite = new Image(getClass().getResource(MonsterDataBase.getSprite(monster.type())).toExternalForm());
-        System.out.println("size sprite: "+sprite.getWidth()+" "+sprite.getHeight());
-        spriteMonster.setX(Math.sqrt(sprite.getHeight()+sprite.getWidth())/2);
-        spriteMonster.setX(Math.sqrt(sprite.getHeight()+sprite.getWidth())/2);
         spriteMonster.setImage(sprite);
     }
 
