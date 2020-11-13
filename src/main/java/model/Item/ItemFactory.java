@@ -12,8 +12,8 @@ public class ItemFactory {
         return new Magic(name, damages, type);
     }
 
-    public usableItem createUsableItem(String name, int damages, ItemDataBase.usableItem type){
-        return new usableItem(name, damages, type);
+    public UsableItem createUsableItem(String name, int damages, ItemDataBase.usableItem type){
+        return new UsableItem(name, damages, type);
     }
 
 }
