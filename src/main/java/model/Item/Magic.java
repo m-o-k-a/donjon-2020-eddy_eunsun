@@ -16,4 +16,7 @@ public class Magic extends AbstractItem {
     public void onUse() {
 
     }
+
+    @Override
+    public String toString() { return getName()+" of "+type; }
 }

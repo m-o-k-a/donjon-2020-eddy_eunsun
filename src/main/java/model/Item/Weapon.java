@@ -15,4 +15,7 @@ public class Weapon extends AbstractItem {
     public void onUse() {
 
     }
+
+    @Override
+    public String toString() { return type+" of "+getName(); }
 }
