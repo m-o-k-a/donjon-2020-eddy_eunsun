@@ -13,6 +13,6 @@ public class usableItem extends AbstractItem {
 
     @Override
     public void onUse() {
-        
+
     }
 }
