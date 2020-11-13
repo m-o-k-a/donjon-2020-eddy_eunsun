@@ -4,7 +4,7 @@ import model.DataBase.ItemDataBase;
 
 public class Magic extends AbstractItem {
 
-    ItemDataBase.magic type;
+    private ItemDataBase.magic type;
 
     public Magic(String name, int damages, ItemDataBase.magic type) {
         super(name, damages);

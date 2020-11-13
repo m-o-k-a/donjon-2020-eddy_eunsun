@@ -16,6 +16,7 @@ public class Chest implements Entity {
     }
 
     public Text dropItem(Player player) {
+        isOpened = true;
         if(item instanceof Weapon) {
             Weapon weapon = (Weapon) item;
             Weapon temp = player.getInventory().getWeapon();
@@ -40,9 +41,11 @@ public class Chest implements Entity {
         return new Text("");
     }
 
+    public boolean isOpened() { return isOpened; }
+
     private Text chestLog(Item itemFrom, Item itemTo) {
-        if(itemFrom == null) { return new Text("<You take the "+itemTo.toString()+" from the chest>"); }
-        else if(itemTo == null) { return new Text("<You drop the "+itemFrom.toString()+" in the chest>"); }
-        else { return new Text("<You take the "+itemTo.toString()+" from the chest, you drop the "+itemFrom.toString()+" in the chest>"); }
+        if(itemFrom == null) { return new Text("<You take the "+itemTo.toString()+" from the chest>\n"); }
+        else if(itemTo == null) { return new Text("<You drop the "+itemFrom.toString()+" in the chest>\n"); }
+        else { return new Text("<You take the "+itemTo.toString()+" from the chest, you drop the "+itemFrom.toString()+" in the chest>\n"); }
     }
 }

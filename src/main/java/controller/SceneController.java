@@ -14,10 +14,12 @@ import javafx.scene.text.TextFlow;
 import model.DataBase.MonsterDataBase;
 import model.Dungeon.Dungeon;
 import model.Dungeon.DungeonGenerator;
+import model.Entity.Chest;
 import model.Entity.EntityFactory;
 import model.Entity.Monster;
 import model.Entity.Player;
 import model.Room.Chamber;
+import model.Room.Room;
 import model.Room.Wall;
 
 import java.net.URL;
@@ -37,11 +39,16 @@ public class SceneController implements Initializable {
     Player player;
     Rectangle playerLife;
     int cellSize;
+
     @FXML GridPane dungeonGrid;
     @FXML TextFlow textLogsContent;
     @FXML Pane lifebar;
     @FXML Canvas minimap;
     @FXML ImageView spriteMonster;
+    @FXML ImageView spriteChest;
+    @FXML TextFlow weaponInfo;
+    @FXML TextFlow itemInfo;
+    @FXML TextFlow magicInfo;
 
 
     @Override
@@ -139,6 +146,19 @@ public class SceneController implements Initializable {
         }
         addLogs(actionLog, Color.WHITE);
         containsMonster(player.x, player.y);
+        containsChest(player.x, player.y);
+    }
+
+    private void containsChest(int x, int y) {
+        Chamber chamber = (Chamber) dungeon.getRoom(x, y);
+        if(chamber.chest != null) {
+            drawChest(chamber.chest);
+        } else { spriteChest.setImage(null); }
+    }
+
+    private void drawChest(Chest chest) {
+        Image sprite = new Image(getClass().getResource("../view/ressources/chest_"+chest.isOpened()+".png").toExternalForm());
+        spriteChest.setImage(sprite);
     }
 
     private void containsMonster(int x, int y) {
@@ -168,8 +188,34 @@ public class SceneController implements Initializable {
      * method that will add an action log dedicated to interaction
      */
     private void actionInteract() {
-        Text actionLog = new Text("<You are alone... Forever alone...>\n");
+        Text actionLog = new Text("<You are not supposed to be there, and you know it>\n");;
+        if(dungeon.getRoom(player.x, player.y) instanceof Chamber) {
+            Chamber room = (Chamber) dungeon.getRoom(player.x, player.y);
+            if(room.monster != null) {  actionLog = new Text("<You tried to communicate with the "+room.monster.getName()+" but all you can hear is incomprehensible noises>\n");}
+            //todo action monstre
+            else if(room.chest != null) {  actionLog = room.chest.dropItem(player); drawChest(room.chest); updateInventoryInfo(); }
+            else { actionLog = new Text("<This room is all dark and lonely>\n"); }
+        }
         addLogs(actionLog, Color.WHITE);
+    }
+
+    private void updateInventoryInfo() {
+        weaponInfo.getChildren().clear(); itemInfo.getChildren().clear(); magicInfo.getChildren().clear();
+        if(player.getInventory().getWeapon() != null) {
+            Text weapon = new Text(player.getInventory().getWeapon().toString()+"\nDamages: "+player.getInventory().getWeapon().getDamages());
+            weapon.setFill(Color.WHITE);
+            weaponInfo.getChildren().add(weapon);
+        }
+        if(player.getInventory().getUsableItem() != null) {
+            Text item = new Text(player.getInventory().getUsableItem().toString()+"\nDamages: "+player.getInventory().getUsableItem().getDamages());
+            item.setFill(Color.WHITE);
+            itemInfo.getChildren().add(item);
+        }
+        if(player.getInventory().getMagic() != null) {
+            Text magic = new Text(player.getInventory().getMagic().toString()+"\nDamages: "+player.getInventory().getMagic().getDamages());
+            magic.setFill(Color.WHITE);
+            magicInfo.getChildren().add(magic);
+        }
     }
 
     /**
