@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="844.0" y="1341.0">model.Room.Chamber</node>
+    <node x="1079.0" y="1261.0">model.Dungeon.DungeonGenerator</node>
+    <node x="0.0" y="1635.0">model.Item.ItemFactory</node>
+    <node x="370.0" y="1635.0">model.Entity.EntityFactory</node>
+    <node x="812.75" y="248.0">model.DataBase.ItemDataBase.usableItem</node>
+    <node x="467.0" y="362.5">model.Entity.Monster</node>
+    <node x="500.5" y="1432.0">model.DataBase.MonsterDataBase.monsters</node>
+    <node x="821.5" y="1261.0">model.Room.Room</node>
+    <node x="994.25" y="0.0">model.DataBase.ItemDataBase</node>
+    <node x="161.5" y="1261.0">model.Item.Item</node>
+    <node x="0.0" y="0.0">controller.SceneController</node>
+    <node x="524.0" y="0.0">model.Entity.Entity</node>
+    <node x="306.0" y="1491.0">model.Item.Magic</node>
+    <node x="744.0" y="1441.5">model.Room.Wall</node>
+    <node x="1023.75" y="215.0">model.DataBase.ItemDataBase.weapons</node>
+    <node x="484.0" y="1261.0">model.DataBase.MonsterDataBase</node>
+    <node x="1223.75" y="193.0">model.DataBase.ItemDataBase.magic</node>
+    <node x="49.0" y="963.0">controller.SceneController.Action</node>
+    <node x="721.0" y="1635.0">model.Item.Inventory</node>
+    <node x="1139.0" y="1635.0">controller.App</node>
+    <node x="1333.0" y="1635.0">model.Battle.GameOver</node>
+    <node x="919.0" y="1635.0">model.Dungeon.Dungeon</node>
+    <node x="311.0" y="318.0">model.Entity.Player</node>
+    <node x="372.75" y="80.0">model.Entity.Characters</node>
+    <node x="147.5" y="1365.0">model.Item.AbstractItem</node>
+    <node x="1400.0" y="1261.0">model.Battle.Battle</node>
+    <node x="153.0" y="1491.0">model.Item.Weapon</node>
+    <node x="0.0" y="1491.0">model.Item.UsableItem</node>
+    <node x="583.75" y="113.0">model.Entity.Chest</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="model.Item.UsableItem" target="model.Item.AbstractItem">
+      <point x="0.0" y="-49.5" />
+      <point x="66.5" y="1466.0" />
+      <point x="171.5" y="1466.0" />
+      <point x="-48.0" y="38.0" />
+    </edge>
+    <edge source="model.Item.Weapon" target="model.Item.AbstractItem">
+      <point x="0.0" y="-49.5" />
+      <point x="0.0" y="38.0" />
+    </edge>
+    <edge source="model.Item.Magic" target="model.Item.AbstractItem">
+      <point x="0.0" y="-49.5" />
+      <point x="372.5" y="1466.0" />
+      <point x="267.5" y="1466.0" />
+      <point x="48.0" y="38.0" />
+    </edge>
+    <edge source="model.Room.Wall" target="model.Room.Room">
+      <point x="0.0" y="-15.0" />
+      <point x="784.0" y="1316.0" />
+      <point x="841.5" y="1316.0" />
+      <point x="-20.0" y="15.0" />
+    </edge>
+    <edge source="model.Entity.Monster" target="model.Entity.Characters">
+      <point x="0.0" y="-49.5" />
+      <point x="557.5" y="293.0" />
+      <point x="516.0" y="293.0" />
+      <point x="47.75" y="94.0" />
+    </edge>
+    <edge source="model.DataBase.ItemDataBase.weapons" target="model.DataBase.ItemDataBase">
+      <point x="0.0" y="-93.5" />
+      <point x="0.0" y="71.5" />
+    </edge>
+    <edge source="model.Entity.Characters" target="model.Entity.Entity">
+      <point x="0.0" y="-94.0" />
+      <point x="468.25" y="55.0" />
+      <point x="548.0" y="55.0" />
+      <point x="-24.0" y="15.0" />
+    </edge>
+    <edge source="model.Entity.Chest" target="model.Entity.Entity">
+      <point x="0.0" y="-61.0" />
+      <point x="675.75" y="55.0" />
+      <point x="596.0" y="55.0" />
+      <point x="24.0" y="15.0" />
+    </edge>
+    <edge source="model.Room.Chamber" target="model.Room.Room">
+      <point x="0.0" y="-115.5" />
+      <point x="939.0" y="1316.0" />
+      <point x="881.5" y="1316.0" />
+      <point x="20.0" y="15.0" />
+    </edge>
+    <edge source="model.DataBase.ItemDataBase.magic" target="model.DataBase.ItemDataBase">
+      <point x="0.0" y="-115.5" />
+      <point x="1306.75" y="168.0" />
+      <point x="1193.4166666666667" y="168.0" />
+      <point x="79.66666666666674" y="71.5" />
+    </edge>
+    <edge source="model.Entity.Player" target="model.Entity.Characters">
+      <point x="0.0" y="-94.0" />
+      <point x="379.0" y="293.0" />
+      <point x="420.5" y="293.0" />
+      <point x="-47.75" y="94.0" />
+    </edge>
+    <edge source="model.DataBase.MonsterDataBase.monsters" target="model.DataBase.MonsterDataBase">
+      <point x="0.0" y="-71.5" />
+      <point x="0.0" y="60.5" />
+    </edge>
+    <edge source="controller.SceneController.Action" target="controller.SceneController">
+      <point x="0.0" y="-126.5" />
+      <point x="0.0" y="456.5" />
+    </edge>
+    <edge source="model.DataBase.ItemDataBase.usableItem" target="model.DataBase.ItemDataBase">
+      <point x="0.0" y="-60.5" />
+      <point x="908.25" y="168.0" />
+      <point x="1034.0833333333333" y="168.0" />
+      <point x="-79.66666666666674" y="71.5" />
+    </edge>
+    <edge source="model.Item.AbstractItem" target="model.Item.Item">
+      <point x="0.0" y="-38.0" />
+      <point x="0.0" y="27.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.3054192812321732" x="262.9337091417585" y="1169.354570879217" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Inner Classes</Category>
+    <Category>Properties</Category>
+    <Category>Methods</Category>
+    <Category>Fields</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

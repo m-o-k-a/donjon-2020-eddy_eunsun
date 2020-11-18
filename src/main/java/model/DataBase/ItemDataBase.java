@@ -6,15 +6,15 @@ public class ItemDataBase {
     private static Random random = new Random();
 
     public enum weapons {
-        SWORD, CLAYMORE, STAFF, POLEARM, FIST
+        Sword, Claymore, Staff, Polearm, Fist
     }
 
     public enum usableItem {
-        POTION, BOMB
+        Potion, Bomb
     }
 
     public enum magic {
-        FIRE, WATER, WIND, THUNDER, LIGHT, DARK, EARTH
+        Fire, Water, Wind, Thunder, Light, Dark, Earth
     }
 
     public static ItemDataBase.weapons getRandomWeapon() {

@@ -49,6 +49,7 @@ public class SceneController implements Initializable {
     @FXML TextFlow weaponInfo;
     @FXML TextFlow itemInfo;
     @FXML TextFlow magicInfo;
+    @FXML Pane scene;
 
 
     @Override
@@ -172,6 +173,8 @@ public class SceneController implements Initializable {
     private void drawMonster(Monster monster) {
         Image sprite = new Image(getClass().getResource(MonsterDataBase.getSprite(monster.type())).toExternalForm());
         spriteMonster.setImage(sprite);
+        spriteMonster.layoutXProperty().bind(scene.widthProperty().subtract(sprite.getWidth()).divide(2));
+        spriteMonster.layoutYProperty().bind(scene.heightProperty().subtract(sprite.getHeight()).divide(2));
     }
 
     private void drawWalls(int x, int y) {

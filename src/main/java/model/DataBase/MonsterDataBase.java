@@ -9,7 +9,7 @@ public class MonsterDataBase {
     private static Random random = new Random();
 
     public enum monsters {
-        SLIME, SKELETON
+        Slime, Skeleton, Ghost
     }
 
     public static String getSprite(monsters monster) {

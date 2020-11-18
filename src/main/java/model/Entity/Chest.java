@@ -43,6 +43,7 @@ public class Chest implements Entity {
 
     public boolean isOpened() { return isOpened; }
 
+    //todo logger ?
     private Text chestLog(Item itemFrom, Item itemTo) {
         if(itemFrom == null) { return new Text("<You take the "+itemTo.toString()+" from the chest>\n"); }
         else if(itemTo == null) { return new Text("<You drop the "+itemFrom.toString()+" in the chest>\n"); }
