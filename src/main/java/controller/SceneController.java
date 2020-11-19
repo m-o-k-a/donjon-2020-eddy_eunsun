@@ -11,7 +11,10 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
+import model.DataBase.ActionDataBase;
 import model.DataBase.MonsterDataBase;
+import model.Difficulty.DifficultyStrategy;
+import model.Difficulty.SimpleDifficultyEnhance;
 import model.Dungeon.Dungeon;
 import model.Dungeon.DungeonGenerator;
 import model.Entity.Chest;
@@ -28,13 +31,10 @@ import java.util.ResourceBundle;
 
 public class SceneController implements Initializable {
 
-    private enum Action {
-        UP, DOWN, LEFT, RIGHT, INTERACT, ATTACK, ITEM, MAGIC
-    }
-
     EntityFactory entityFactory = new EntityFactory();
     Random random = new Random();
     DungeonGenerator dungeonGenerator = new DungeonGenerator();
+    DifficultyStrategy difficultyStrategy;
     Dungeon dungeon;
     Player player;
     Rectangle playerLife;
@@ -57,10 +57,11 @@ public class SceneController implements Initializable {
         //todo initialize dungeon
         cellSize = 40; //pls do not go above 50
         dungeon = new Dungeon(dungeonGenerator.generate(cellSize));
+        difficultyStrategy = new SimpleDifficultyEnhance();
 
         //todo character
         Integer[] position = startingPosition(cellSize);
-        player = entityFactory.createPlayer(position[0], position[1], 100, 10, "Warrior");
+        player = entityFactory.createPlayer(position[0], position[1], 1000, 10, "Warrior");
         drawWalls(player.x, player.y);
 
         //todo refractor battle controller
@@ -68,6 +69,8 @@ public class SceneController implements Initializable {
         lifebar.getChildren().add(playerLife);
         drawMiniMap(cellSize, dungeon);
         drawWalls(player.x, player.y);
+        if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) { difficultyStrategy.doUpdateDifficulty(); }
+
     }
 
     private Integer[] startingPosition(int cellSize) {
@@ -78,6 +81,10 @@ public class SceneController implements Initializable {
         } while(dungeon.getRoom(x, y) != null && (dungeon.getRoom(x, y) instanceof Wall));
         position[0] = x; position[1] = y;
         return position;
+    }
+
+    private Room getPlayerRoom(Player player) {
+        return dungeon.getRoom(player.x, player.y);
     }
 
     private void drawMiniMap(int roomSize, Dungeon dungeon) {
@@ -104,27 +111,33 @@ public class SceneController implements Initializable {
     //TODO REGLER LE SOUCIS DES MURS
 
     private void drawLifeBar() {
-        playerLife.setWidth((lifebar.getPrefWidth()*player.getHealth())/100);
+        playerLife.setWidth((lifebar.getPrefWidth()*player.getHealth())/player.getMaxHealth());
     }
 
     /**
      * JAVAFX BUTTONS ACTIONS
      */
-    @FXML private void goUp() { actionMoveTo(Action.UP); }
-    @FXML private void goDown() { actionMoveTo(Action.DOWN); }
-    @FXML private void goLeft() { actionMoveTo(Action.LEFT); }
-    @FXML private void goRight() { actionMoveTo(Action.RIGHT); }
+    @FXML private void goUp() { actionMoveTo(ActionDataBase.Action.UP); }
+    @FXML private void goDown() { actionMoveTo(ActionDataBase.Action.DOWN); }
+    @FXML private void goLeft() { actionMoveTo(ActionDataBase.Action.LEFT); }
+    @FXML private void goRight() { actionMoveTo(ActionDataBase.Action.RIGHT); }
     @FXML private void interact() { actionInteract(); }
-    @FXML private void attack() { actionAttack(); } //todo implements
-    @FXML private void item() { } //todo implements
-    @FXML private void magic() { } //todo implements
+
+    @FXML private void attack() { actionBattle(ActionDataBase.Action.ATTACK); }
+    @FXML private void item() { actionBattle(ActionDataBase.Action.ITEM); }
+    @FXML private void magic() { actionBattle(ActionDataBase.Action.MAGIC); }
 
     /**
      * mehtod that will add an action log for movement
      * @param action the enum value of the movement
      */
-    private void actionMoveTo(Action action) {
+    private void actionMoveTo(ActionDataBase.Action action) {
         Text actionLog;
+        Chamber actualChamber = ((Chamber) getPlayerRoom(player));
+        if(actualChamber.isBattle()) {
+            actionBattle(action);
+            return;
+        }
         try {
             Integer[] lastPosition = new Integer[2]; lastPosition[0] = player.x; lastPosition[1] = player.y;
             switch (action) {
@@ -134,20 +147,51 @@ public class SceneController implements Initializable {
                 case RIGHT: player.goRight(); break;
                 default: return;
             }
-            if (dungeon.getRoom(player.x, player.y) instanceof Wall) {
+            if (getPlayerRoom(player) instanceof Wall) {
                 player.x = lastPosition[0]; player.y = lastPosition[1];
                 throw new Exception();
             }
             drawMiniMapCell(Color.LIGHTGRAY, (int)(minimap.getWidth()/cellSize), lastPosition[0], lastPosition[1]);
+            if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) { difficultyStrategy.doUpdateDifficulty(); }
             drawMiniMapCell(Color.LIME, (int)(minimap.getWidth()/cellSize), player.x, player.y);
             drawWalls(player.x, player.y);
             actionLog = new Text("<Moved to ("+player.x+", "+player.y+")>\n"); actionLog.setStyle("-fx-font-style: italic;");
         } catch (Exception e) {
             actionLog = new Text("You cannot pass a wall.\n"); actionLog.setStyle("-fx-font-style: italic;");
         }
-        addLogs(actionLog, Color.WHITE);
+        addLogs(Color.WHITE, actionLog);
         containsMonster(player.x, player.y);
         containsChest(player.x, player.y);
+        initBattle(getPlayerRoom(player));
+    }
+
+    private void initBattle(Room playerRoom) {
+        if ((playerRoom instanceof Chamber)) {
+            Chamber playerChamber = (Chamber) playerRoom;
+            if(!playerChamber.isBattle()) {
+                playerChamber.initializeBattle(player);
+            }
+        }
+    }
+
+    /**
+     * method that will add an action log for battle
+     * @param action the enum value of the movement
+     */
+    private void actionBattle(ActionDataBase.Action action) {
+        if ((getPlayerRoom(player) instanceof Chamber)) {
+            Chamber playerChamber = (Chamber) getPlayerRoom(player);
+            if(playerChamber.isBattle()) {
+                Text[] logs = playerChamber.battleTurn(action);
+                addLogs(Color.RED, logs);
+                drawLifeBar();
+                if(playerChamber.monster.isDead()) {
+                    spriteMonster.setImage(null);
+                }
+            } else {
+                addLogs(Color.WHITE, new Text("You tried to damages the void, without success...\n"));
+            }
+        }
     }
 
     private void containsChest(int x, int y) {
@@ -165,8 +209,10 @@ public class SceneController implements Initializable {
     private void containsMonster(int x, int y) {
         Chamber chamber = (Chamber) dungeon.getRoom(x, y);
         if(chamber.monster != null) {
-            addLogs(new Text("You face a "+chamber.monster.getName()+"\n"), Color.RED);
-            drawMonster(chamber.monster);
+            if(!chamber.monster.isDead()) {
+                addLogs(Color.RED, new Text("You face a "+chamber.monster.getName()+"\n"));
+                drawMonster(chamber.monster);
+            } else { spriteMonster.setImage(null); }
         } else { spriteMonster.setImage(null); }
     }
 
@@ -192,14 +238,18 @@ public class SceneController implements Initializable {
      */
     private void actionInteract() {
         Text actionLog = new Text("<You are not supposed to be there, and you know it>\n");;
-        if(dungeon.getRoom(player.x, player.y) instanceof Chamber) {
-            Chamber room = (Chamber) dungeon.getRoom(player.x, player.y);
-            if(room.monster != null) {  actionLog = new Text("<You tried to communicate with the "+room.monster.getName()+" but all you can hear is incomprehensible noises>\n");}
-            //todo action monstre
-            else if(room.chest != null) {  actionLog = room.chest.dropItem(player); drawChest(room.chest); updateInventoryInfo(); }
+        if(getPlayerRoom(player) instanceof Chamber) {
+            Chamber room = (Chamber) getPlayerRoom(player);
+            if(room.monster != null) {
+                if (!room.monster.isDead()) {
+                    addLogs(Color.WHITE, new Text("<You tried to communicate with the "+room.monster.getName()+" but all you can hear is incomprehensible noises>\n"));
+                    return;
+                }
+            }
+            if(room.chest != null) {  actionLog = room.chest.dropItem(player); drawChest(room.chest); updateInventoryInfo(); }
             else { actionLog = new Text("<This room is all dark and lonely>\n"); }
         }
-        addLogs(actionLog, Color.WHITE);
+        addLogs(Color.WHITE, actionLog);
     }
 
     private void updateInventoryInfo() {
@@ -222,20 +272,14 @@ public class SceneController implements Initializable {
     }
 
     /**
-     * method that will add an action log dedicated to attack
-     */
-    private void actionAttack() {
-        Text actionLog = new Text("You Attacked nothing\n");
-        addLogs(actionLog, Color.RED);
-    }
-
-    /**
      * method that will add a log to the textFlow textLogsContent of the interface
-     * @param log
+     * @param logs
      */
-    private void addLogs(Text log, Color color) {
-        log.setFill(color);
-        textLogsContent.getChildren().add(0, log);
+    private void addLogs(Color color, Text... logs) {
+        for(Text log : logs) {
+            log.setFill(color);
+            textLogsContent.getChildren().add(0, log);
+        }
     }
 }
 

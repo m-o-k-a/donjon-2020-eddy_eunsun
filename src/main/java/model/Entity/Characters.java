@@ -14,6 +14,7 @@ public abstract class Characters implements Entity {
     }
 
     public int getHealth() { return health; }
+    public int getMaxHealth() { return maxHealth; }
     public int getStrength() { return strength; }
     public String getName() { return name; }
 

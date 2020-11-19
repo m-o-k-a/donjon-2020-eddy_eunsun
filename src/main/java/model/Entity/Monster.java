@@ -1,5 +1,6 @@
 package model.Entity;
 
+import model.DataBase.ActionDataBase;
 import model.DataBase.MonsterDataBase;
 
 public class Monster extends Characters {
@@ -14,7 +15,8 @@ public class Monster extends Characters {
         return typeOfMonster;
     }
 
-    public void selectAction() {
-
+    public ActionDataBase.Action selectAction() {
+        //only attack
+        return ActionDataBase.Action.ATTACK;
     }
 }
