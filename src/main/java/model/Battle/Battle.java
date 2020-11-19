@@ -4,6 +4,7 @@ import javafx.scene.text.Text;
 import model.DataBase.ActionDataBase;
 import model.Entity.Monster;
 import model.Entity.Player;
+import model.Item.UsableItem;
 
 public class Battle {
     private final Player player;
@@ -34,6 +35,15 @@ public class Battle {
                 int damages = updateMonsterHealth(monster, (player.getStrength() + (player.getInventory().getWeapon() == null ? 0 : player.getInventory().getWeapon().getDamages())));
                 playerLog = new Text("You attacked the "+monster.type()+" It loose "+damages+" Health\n");
                 break;
+            case ITEM:
+                UsableItem item = player.getInventory().getUsableItem();
+                if(item.getDamages() < 0) {
+                    updatePlayerHealth(player, item.getDamages());
+                    playerLog = new Text("You Heal yourself using a "+item.toString()+"\n");
+                } else {
+                    updateMonsterHealth(monster, item.getDamages());
+                    playerLog = new Text("You throw a "+item.toString()+" on the "+monster.toString()+". It inflicted "+item.getDamages()+" damages\n");
+                }
             default:
                 break;
         }
