@@ -21,7 +21,6 @@
 }
 
 .text-log {
-    -fx-background-color: rgba(0,0,0,0);
     -fx-background-image: url("./ressources/log.jpg");
     -fx-background-position: fixed;
 }

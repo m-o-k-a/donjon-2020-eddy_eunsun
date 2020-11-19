@@ -3,6 +3,7 @@ package controller;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -24,6 +25,7 @@ import model.Entity.Player;
 import model.Room.Chamber;
 import model.Room.Room;
 import model.Room.Wall;
+import view.draw.MiniMap;
 
 import java.net.URL;
 import java.util.Random;
@@ -51,6 +53,8 @@ public class SceneController implements Initializable {
     @FXML TextFlow magicInfo;
     @FXML Pane scene;
 
+    private MiniMap drawMiniMap;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -62,15 +66,18 @@ public class SceneController implements Initializable {
         //todo character
         Integer[] position = startingPosition(cellSize);
         player = entityFactory.createPlayer(position[0], position[1], 1000, 10, "Warrior");
-        drawWalls(player.x, player.y);
 
         //todo refractor battle controller
         playerLife = new Rectangle(lifebar.getPrefWidth(), lifebar.getPrefHeight(), Color.LIME);
         lifebar.getChildren().add(playerLife);
-        drawMiniMap(cellSize, dungeon);
-        drawWalls(player.x, player.y);
         if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) { difficultyStrategy.doUpdateDifficulty(); }
+        //initialize drawable
+        drawMiniMap = new MiniMap(minimap, player, dungeon, cellSize);
+        updateMiniMap();
+    }
 
+    private void updateMiniMap() {
+        drawMiniMap.draw();
     }
 
     private Integer[] startingPosition(int cellSize) {
@@ -85,25 +92,6 @@ public class SceneController implements Initializable {
 
     private Room getPlayerRoom(Player player) {
         return dungeon.getRoom(player.x, player.y);
-    }
-
-    private void drawMiniMap(int roomSize, Dungeon dungeon) {
-        Color color = Color.BLACK;
-        int cellSize = (int) (minimap.getWidth()/roomSize);
-        for(int width = 0; width<roomSize; width++) {
-            for(int height = 0; height<roomSize; height++) {
-                if(dungeon.getRoom(width, height) instanceof Chamber) {
-                        if(player.x == width && player.y == height) { color = Color.LIME; }
-                        else { color = Color.BLACK; }
-                }
-                drawMiniMapCell(color, cellSize, width, height);
-            }
-        }
-    }
-
-    private void drawMiniMapCell(Color color, int cellSize, int width, int height) {
-        minimap.getGraphicsContext2D().setFill(color);
-        minimap.getGraphicsContext2D().fillRect(width*cellSize, height*cellSize, cellSize-1, cellSize-1);
     }
 
     //todo refractor battle controller
@@ -151,10 +139,8 @@ public class SceneController implements Initializable {
                 player.x = lastPosition[0]; player.y = lastPosition[1];
                 throw new Exception();
             }
-            drawMiniMapCell(Color.LIGHTGRAY, (int)(minimap.getWidth()/cellSize), lastPosition[0], lastPosition[1]);
             if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) { difficultyStrategy.doUpdateDifficulty(); }
-            drawMiniMapCell(Color.LIME, (int)(minimap.getWidth()/cellSize), player.x, player.y);
-            drawWalls(player.x, player.y);
+            updateMiniMap();
             actionLog = new Text("<Moved to ("+player.x+", "+player.y+")>\n"); actionLog.setStyle("-fx-font-style: italic;");
         } catch (Exception e) {
             actionLog = new Text("You cannot pass a wall.\n"); actionLog.setStyle("-fx-font-style: italic;");
@@ -191,6 +177,7 @@ public class SceneController implements Initializable {
             } else {
                 addLogs(Color.WHITE, new Text("You tried to damages the void, without success...\n"));
             }
+            updateInventoryInfo();
         }
     }
 
@@ -221,16 +208,6 @@ public class SceneController implements Initializable {
         spriteMonster.setImage(sprite);
         spriteMonster.layoutXProperty().bind(scene.widthProperty().subtract(sprite.getWidth()).divide(2));
         spriteMonster.layoutYProperty().bind(scene.heightProperty().subtract(sprite.getHeight()).divide(2));
-    }
-
-    private void drawWalls(int x, int y) {
-        //todo remove openeddoors
-        Chamber chamber = (Chamber) dungeon.getRoom(x, y);
-        //LEFT UP RIGHT DOWN
-        if(dungeon.getRoom(player.x-1, player.y) instanceof Wall) { drawMiniMapCell(Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x-1, y);}
-        if(dungeon.getRoom(player.x, player.y-1) instanceof Wall) { drawMiniMapCell(Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x, y-1);}
-        if(dungeon.getRoom(player.x+1, player.y) instanceof Wall) { drawMiniMapCell(Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x+1, y);}
-        if(dungeon.getRoom(player.x, player.y+1) instanceof Wall) { drawMiniMapCell(Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x, y+1);}
     }
 
     /**
@@ -282,25 +259,3 @@ public class SceneController implements Initializable {
         }
     }
 }
-
-/*
---fat method if we want to apply keyboard
-    private void action(Action action) {
-        if(false) {
-            //Todo if cannot move
-        }
-        else {
-            switch (action) {
-                case UP: player.goUp(); actionMoveTo(); break;
-                case DOWN: player.goDown(); actionMoveTo(); break;
-                case LEFT: player.goLeft(); actionMoveTo(); break;
-                case RIGHT: player.goRight(); actionMoveTo(); break;
-                case INTERACT: actionInteract(); break; //todo implements interactions
-                case ATTACK: actionAttack(); break; //todo implements attack
-                case ITEM: break; //todo implements item
-                case MAGIC: break; //todo implements magic
-                default: return;
-            }
-        }
-    }
- */

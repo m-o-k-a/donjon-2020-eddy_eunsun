@@ -42,8 +42,10 @@ public class Battle {
                     playerLog = new Text("You Heal yourself using a "+item.toString()+"\n");
                 } else {
                     updateMonsterHealth(monster, item.getDamages());
-                    playerLog = new Text("You throw a "+item.toString()+" on the "+monster.toString()+". It inflicted "+item.getDamages()+" damages\n");
+                    playerLog = new Text("You throw a "+item.toString()+" on the "+monster.type()+". It inflicted "+item.getDamages()+" damages\n");
                 }
+                player.getInventory().setUsableItem(null);
+                break;
             default:
                 break;
         }
