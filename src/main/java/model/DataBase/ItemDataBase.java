@@ -1,8 +1,15 @@
 package model.DataBase;
 
+import model.Entity.Monster;
+import model.Item.ItemFactory;
+import model.Item.Magic;
+import model.Item.UsableItem;
+import model.Item.Weapon;
+
 import java.util.Random;
 
 public class ItemDataBase {
+    private static ItemFactory itemFactory = new ItemFactory();
     private static Random random = new Random();
 
     public enum weapons {
@@ -17,11 +24,26 @@ public class ItemDataBase {
         Fire, Water, Wind, Thunder, Light, Dark, Earth
     }
 
-    public static ItemDataBase.weapons getRandomWeapon() {
+    private static ItemDataBase.weapons getRandomWeapon() {
         return randomEnum(ItemDataBase.weapons.class);
     }
-    public static ItemDataBase.usableItem getRandomUsableItem() { return randomEnum(ItemDataBase.usableItem.class); }
-    public static ItemDataBase.magic getRandomMagic() { return randomEnum(ItemDataBase.magic.class); }
+    private static ItemDataBase.usableItem getRandomUsableItem() { return randomEnum(ItemDataBase.usableItem.class); }
+    private static ItemDataBase.magic getRandomMagic() { return randomEnum(ItemDataBase.magic.class); }
+
+    public static Weapon generateWeapon(int difficulty) {
+        return itemFactory.createWeapon("God", random.nextInt(10*difficulty), getRandomWeapon());
+    }
+
+    public static Magic generateMagic(int difficulty) {
+        return itemFactory.createMagic("God", random.nextInt(20*difficulty), getRandomMagic());
+    }
+
+    public static UsableItem generateUsableItem(int difficulty) {
+        ItemDataBase.usableItem item = getRandomUsableItem();
+        int damages = random.nextInt(15*difficulty);
+        if(item == usableItem.Potion) damages *=-1;
+        return itemFactory.createUsableItem("God", damages, item);
+    }
 
     private static <T extends Enum<?>> T randomEnum(Class<T> type){
         int x = random.nextInt(type.getEnumConstants().length);
