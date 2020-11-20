@@ -81,9 +81,18 @@ public class SceneController implements Initializable {
         drawLifeBar = new LifeBar(playerLife, player, lifebar.getPrefWidth());
         drawChest = new ChestDrawable(spriteChest);
         drawMonster = new MonsterDrawable(spriteMonster, scene);
+        //todo first image always wrong wtf hint: set with first image in constructor
         drawDungeon = new DungeonDrawable(scene);
+        update();
+    }
+
+    private void update() {
         updateMiniMap();
         updateDungeon();
+        updateLifeBar();
+        updateMonster(player.x, player.y);
+        updateChest(player.x, player.y);
+        updateInventoryInfo();
     }
 
     private void updateMiniMap() {
@@ -92,15 +101,48 @@ public class SceneController implements Initializable {
     private void updateLifeBar() { drawLifeBar.draw(); }
     private void updateDungeon() {
         if(getPlayerRoom(player) instanceof Chamber) {
-            Chamber chamber = (Chamber) getPlayerRoom(player);
             String wallLeft = (dungeon.getRoom(player.x-1, player.y) instanceof Wall) ? "0" : "1";
             String wallTop = (dungeon.getRoom(player.x, player.y-1) instanceof Wall) ? "0" : "1";
             String wallRight = (dungeon.getRoom(player.x+1, player.y) instanceof Wall) ? "0" : "1";
             String values = wallLeft+wallTop+wallRight;
             System.out.println("VALUES: "+values);
             drawDungeon.setBackground("../ressources/room-"+values+".jpg");
-            System.out.println("../ressources/room-"+values+".jpg");
             drawDungeon.draw();
+        }
+    }
+    private void updateChest(int x, int y) {
+        Chamber chamber = (Chamber) dungeon.getRoom(x, y);
+        if(chamber.chest != null) {
+            drawChest.setChest(chamber.chest);
+            drawChest.draw();
+        } else { drawChest.clear(); }
+    }
+    private void updateMonster(int x, int y) {
+        Chamber chamber = (Chamber) dungeon.getRoom(x, y);
+        if(chamber.monster != null) {
+            if(!chamber.monster.isDead()) {
+                addLogs(Color.RED, new Text("You face a "+chamber.monster.getName()+"\n"));
+                drawMonster.setMonster(chamber.monster);
+                drawMonster.draw();
+            } else { drawMonster.clear(); }
+        } else { drawMonster.clear(); }
+    }
+    private void updateInventoryInfo() {
+        weaponInfo.getChildren().clear(); itemInfo.getChildren().clear(); magicInfo.getChildren().clear();
+        if(player.getInventory().getWeapon() != null) {
+            Text weapon = new Text(player.getInventory().getWeapon().toString()+"\nDamages: "+player.getInventory().getWeapon().getDamages());
+            weapon.setFill(Color.WHITE);
+            weaponInfo.getChildren().add(weapon);
+        }
+        if(player.getInventory().getUsableItem() != null) {
+            Text item = new Text(player.getInventory().getUsableItem().toString()+"\nDamages: "+player.getInventory().getUsableItem().getDamages());
+            item.setFill(Color.WHITE);
+            itemInfo.getChildren().add(item);
+        }
+        if(player.getInventory().getMagic() != null) {
+            Text magic = new Text(player.getInventory().getMagic().toString()+"\nDamages: "+player.getInventory().getMagic().getDamages());
+            magic.setFill(Color.WHITE);
+            magicInfo.getChildren().add(magic);
         }
     }
 
@@ -157,15 +199,12 @@ public class SceneController implements Initializable {
                 throw new Exception();
             }
             if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) { difficultyStrategy.doUpdateDifficulty(); }
-            updateMiniMap();
-            updateDungeon();
             actionLog = new Text("<Moved to ("+player.x+", "+player.y+")>\n"); actionLog.setStyle("-fx-font-style: italic;");
         } catch (Exception e) {
             actionLog = new Text("You cannot pass a wall.\n"); actionLog.setStyle("-fx-font-style: italic;");
         }
+        update();
         addLogs(Color.WHITE, actionLog);
-        containsMonster(player.x, player.y);
-        containsChest(player.x, player.y);
         initBattle(getPlayerRoom(player));
     }
 
@@ -214,27 +253,7 @@ public class SceneController implements Initializable {
             }
         }
         if(haveNothing) { addLogs(Color.WHITE, new Text("You tried to damage the void, without success...\n")); }
-        updateInventoryInfo();
-        updateLifeBar();
-    }
-
-    private void containsChest(int x, int y) {
-        Chamber chamber = (Chamber) dungeon.getRoom(x, y);
-        if(chamber.chest != null) {
-            drawChest.setChest(chamber.chest);
-            drawChest.draw();
-        } else { drawChest.clear(); }
-    }
-
-    private void containsMonster(int x, int y) {
-        Chamber chamber = (Chamber) dungeon.getRoom(x, y);
-        if(chamber.monster != null) {
-            if(!chamber.monster.isDead()) {
-                addLogs(Color.RED, new Text("You face a "+chamber.monster.getName()+"\n"));
-                drawMonster.setMonster(chamber.monster);
-                drawMonster.draw();
-            } else { drawMonster.clear(); }
-        } else { drawMonster.clear(); }
+        update();
     }
 
     /**
@@ -254,30 +273,11 @@ public class SceneController implements Initializable {
             if(room.chest != null) {
                 actionLog = room.chest.dropItem(player);
                 drawChest.setChest(room.chest);
-                drawChest.draw();
-                updateInventoryInfo(); }
+                drawChest.draw(); }
             else { actionLog = new Text("<This room is all dark and lonely>\n"); }
         }
         addLogs(Color.WHITE, actionLog);
-    }
-
-    private void updateInventoryInfo() {
-        weaponInfo.getChildren().clear(); itemInfo.getChildren().clear(); magicInfo.getChildren().clear();
-        if(player.getInventory().getWeapon() != null) {
-            Text weapon = new Text(player.getInventory().getWeapon().toString()+"\nDamages: "+player.getInventory().getWeapon().getDamages());
-            weapon.setFill(Color.WHITE);
-            weaponInfo.getChildren().add(weapon);
-        }
-        if(player.getInventory().getUsableItem() != null) {
-            Text item = new Text(player.getInventory().getUsableItem().toString()+"\nDamages: "+player.getInventory().getUsableItem().getDamages());
-            item.setFill(Color.WHITE);
-            itemInfo.getChildren().add(item);
-        }
-        if(player.getInventory().getMagic() != null) {
-            Text magic = new Text(player.getInventory().getMagic().toString()+"\nDamages: "+player.getInventory().getMagic().getDamages());
-            magic.setFill(Color.WHITE);
-            magicInfo.getChildren().add(magic);
-        }
+        update();
     }
 
     /**

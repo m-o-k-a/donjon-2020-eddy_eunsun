@@ -26,6 +26,7 @@ public class DungeonDrawable implements Drawable {
 
     @Override
     public void draw() {
+        scene.setBackground(null);
         backgroundImage = new BackgroundImage(image, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         scene.setBackground(new Background(backgroundImage));
     }
