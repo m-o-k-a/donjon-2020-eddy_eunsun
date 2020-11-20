@@ -17,7 +17,7 @@ public class MonsterDataBase {
     }
 
     public static String getSprite(monsters monster) {
-        return "../view/ressources/"+monster+".png";
+        return "../ressources/"+monster+".png";
     }
 
     private static monsters getRandomMonster() {

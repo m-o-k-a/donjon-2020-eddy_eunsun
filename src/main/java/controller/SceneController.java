@@ -4,6 +4,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.effect.InnerShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -25,7 +26,11 @@ import model.Entity.Player;
 import model.Room.Chamber;
 import model.Room.Room;
 import model.Room.Wall;
+import org.w3c.dom.css.Rect;
+import view.draw.ChestDrawable;
+import view.draw.LifeBar;
 import view.draw.MiniMap;
+import view.draw.MonsterDrawable;
 
 import java.net.URL;
 import java.util.Random;
@@ -39,7 +44,6 @@ public class SceneController implements Initializable {
     DifficultyStrategy difficultyStrategy;
     Dungeon dungeon;
     Player player;
-    Rectangle playerLife;
     int cellSize;
 
     @FXML GridPane dungeonGrid;
@@ -54,6 +58,9 @@ public class SceneController implements Initializable {
     @FXML Pane scene;
 
     private MiniMap drawMiniMap;
+    private LifeBar drawLifeBar;
+    private ChestDrawable drawChest;
+    private MonsterDrawable drawMonster;
 
 
     @Override
@@ -65,20 +72,24 @@ public class SceneController implements Initializable {
 
         //todo character
         Integer[] position = startingPosition(cellSize);
-        player = entityFactory.createPlayer(position[0], position[1], 1000, 10, "Warrior");
+        player = entityFactory.createPlayer(position[0], position[1], 50, 10, "Warrior");
 
         //todo refractor battle controller
-        playerLife = new Rectangle(lifebar.getPrefWidth(), lifebar.getPrefHeight(), Color.LIME);
+        Rectangle playerLife = new Rectangle(lifebar.getPrefWidth(), lifebar.getPrefHeight(), Color.LIME);
         lifebar.getChildren().add(playerLife);
         if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) { difficultyStrategy.doUpdateDifficulty(); }
         //initialize drawable
         drawMiniMap = new MiniMap(minimap, player, dungeon, cellSize);
+        drawLifeBar = new LifeBar(playerLife, player, lifebar.getPrefWidth());
+        drawChest = new ChestDrawable(spriteChest);
+        drawMonster = new MonsterDrawable(spriteMonster, scene);
         updateMiniMap();
     }
 
     private void updateMiniMap() {
         drawMiniMap.draw();
     }
+    private void updateLifeBar() { drawLifeBar.draw(); }
 
     private Integer[] startingPosition(int cellSize) {
         Integer[] position = new Integer[2];
@@ -92,14 +103,6 @@ public class SceneController implements Initializable {
 
     private Room getPlayerRoom(Player player) {
         return dungeon.getRoom(player.x, player.y);
-    }
-
-    //todo refractor battle controller
-
-    //TODO REGLER LE SOUCIS DES MURS
-
-    private void drawLifeBar() {
-        playerLife.setWidth((lifebar.getPrefWidth()*player.getHealth())/player.getMaxHealth());
     }
 
     /**
@@ -120,6 +123,7 @@ public class SceneController implements Initializable {
      * @param action the enum value of the movement
      */
     private void actionMoveTo(ActionDataBase.Action action) {
+        if(player.isDead()) return;
         Text actionLog;
         Chamber actualChamber = ((Chamber) getPlayerRoom(player));
         if(actualChamber.isBattle()) {
@@ -164,33 +168,48 @@ public class SceneController implements Initializable {
      * method that will add an action log for battle
      * @param action the enum value of the movement
      */
+    //todo refractor
     private void actionBattle(ActionDataBase.Action action) {
+        if(player.isDead()) return;
+        boolean haveNothing = true;
         if ((getPlayerRoom(player) instanceof Chamber)) {
             Chamber playerChamber = (Chamber) getPlayerRoom(player);
             if(playerChamber.isBattle()) {
                 Text[] logs = playerChamber.battleTurn(action);
                 addLogs(Color.RED, logs);
-                drawLifeBar();
                 if(playerChamber.monster.isDead()) {
                     spriteMonster.setImage(null);
                 }
-            } else {
-                addLogs(Color.WHITE, new Text("You tried to damages the void, without success...\n"));
+                haveNothing = false;
             }
-            updateInventoryInfo();
+            else if(action == ActionDataBase.Action.ITEM && player.getInventory().getUsableItem() != null) {
+                if(player.getInventory().getUsableItem().getDamages() < 0) {
+                    player.dammages(player.getInventory().getUsableItem().getDamages());
+                    addLogs(Color.RED, new Text("You Healed yourself using a "+player.getInventory().getUsableItem().toString()+"\n"));
+                    player.getInventory().setUsableItem(null);
+                    haveNothing = false;
+                }
+            }
+            else if(action == ActionDataBase.Action.MAGIC && player.getInventory().getMagic() != null) {
+                if(player.getInventory().getMagic().getDamages() < 0) {
+                    player.dammages(player.getInventory().getMagic().getDamages());
+                    addLogs(Color.RED, new Text("You read the incantation in the "+player.getInventory().getMagic().getDamages()+" and healed yourself\n"));
+                    player.getInventory().setMagic(null);
+                    haveNothing = false;
+                }
+            }
         }
+        if(haveNothing) { addLogs(Color.WHITE, new Text("You tried to damage the void, without success...\n")); }
+        updateInventoryInfo();
+        updateLifeBar();
     }
 
     private void containsChest(int x, int y) {
         Chamber chamber = (Chamber) dungeon.getRoom(x, y);
         if(chamber.chest != null) {
-            drawChest(chamber.chest);
-        } else { spriteChest.setImage(null); }
-    }
-
-    private void drawChest(Chest chest) {
-        Image sprite = new Image(getClass().getResource("../view/ressources/chest_"+chest.isOpened()+".png").toExternalForm());
-        spriteChest.setImage(sprite);
+            drawChest.setChest(chamber.chest);
+            drawChest.draw();
+        } else { drawChest.clear(); }
     }
 
     private void containsMonster(int x, int y) {
@@ -198,32 +217,31 @@ public class SceneController implements Initializable {
         if(chamber.monster != null) {
             if(!chamber.monster.isDead()) {
                 addLogs(Color.RED, new Text("You face a "+chamber.monster.getName()+"\n"));
-                drawMonster(chamber.monster);
-            } else { spriteMonster.setImage(null); }
-        } else { spriteMonster.setImage(null); }
-    }
-
-    private void drawMonster(Monster monster) {
-        Image sprite = new Image(getClass().getResource(MonsterDataBase.getSprite(monster.type())).toExternalForm());
-        spriteMonster.setImage(sprite);
-        spriteMonster.layoutXProperty().bind(scene.widthProperty().subtract(sprite.getWidth()).divide(2));
-        spriteMonster.layoutYProperty().bind(scene.heightProperty().subtract(sprite.getHeight()).divide(2));
+                drawMonster.setMonster(chamber.monster);
+                drawMonster.draw();
+            } else { drawMonster.clear(); }
+        } else { drawMonster.clear(); }
     }
 
     /**
      * method that will add an action log dedicated to interaction
      */
     private void actionInteract() {
-        Text actionLog = new Text("<You are not supposed to be there, and you know it>\n");;
+        if(player.isDead()) return;
+        Text actionLog = new Text("<You are not supposed to be there and you know it>\n");
         if(getPlayerRoom(player) instanceof Chamber) {
             Chamber room = (Chamber) getPlayerRoom(player);
             if(room.monster != null) {
                 if (!room.monster.isDead()) {
-                    addLogs(Color.WHITE, new Text("<You tried to communicate with the "+room.monster.getName()+" but all you can hear is incomprehensible noises>\n"));
+                    addLogs(Color.WHITE, new Text("<You tried to communicate with the "+room.monster.getName()+" but all you could hear was incomprehensible noises>\n"));
                     return;
                 }
             }
-            if(room.chest != null) {  actionLog = room.chest.dropItem(player); drawChest(room.chest); updateInventoryInfo(); }
+            if(room.chest != null) {
+                actionLog = room.chest.dropItem(player);
+                drawChest.setChest(room.chest);
+                drawChest.draw();
+                updateInventoryInfo(); }
             else { actionLog = new Text("<This room is all dark and lonely>\n"); }
         }
         addLogs(Color.WHITE, actionLog);

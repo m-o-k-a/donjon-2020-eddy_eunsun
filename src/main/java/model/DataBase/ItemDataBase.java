@@ -21,7 +21,7 @@ public class ItemDataBase {
     }
 
     public enum magic {
-        Fire, Water, Wind, Thunder, Light, Dark, Earth
+        Fire, Water, Earth, Light, Dark
     }
 
     private static ItemDataBase.weapons getRandomWeapon() {
@@ -35,7 +35,10 @@ public class ItemDataBase {
     }
 
     public static Magic generateMagic(int difficulty) {
-        return itemFactory.createMagic("God", random.nextInt(20*difficulty), getRandomMagic());
+        ItemDataBase.magic magicItem = getRandomMagic();
+        int damages = random.nextInt(20*difficulty);
+        if (magicItem == magic.Light) damages *=-1;
+        return itemFactory.createMagic("God", damages, magicItem);
     }
 
     public static UsableItem generateUsableItem(int difficulty) {
