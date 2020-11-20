@@ -27,10 +27,7 @@ import model.Room.Chamber;
 import model.Room.Room;
 import model.Room.Wall;
 import org.w3c.dom.css.Rect;
-import view.draw.ChestDrawable;
-import view.draw.LifeBar;
-import view.draw.MiniMap;
-import view.draw.MonsterDrawable;
+import view.draw.*;
 
 import java.net.URL;
 import java.util.Random;
@@ -61,6 +58,7 @@ public class SceneController implements Initializable {
     private LifeBar drawLifeBar;
     private ChestDrawable drawChest;
     private MonsterDrawable drawMonster;
+    private DungeonDrawable drawDungeon;
 
 
     @Override
@@ -83,13 +81,28 @@ public class SceneController implements Initializable {
         drawLifeBar = new LifeBar(playerLife, player, lifebar.getPrefWidth());
         drawChest = new ChestDrawable(spriteChest);
         drawMonster = new MonsterDrawable(spriteMonster, scene);
+        drawDungeon = new DungeonDrawable(scene);
         updateMiniMap();
+        updateDungeon();
     }
 
     private void updateMiniMap() {
         drawMiniMap.draw();
     }
     private void updateLifeBar() { drawLifeBar.draw(); }
+    private void updateDungeon() {
+        if(getPlayerRoom(player) instanceof Chamber) {
+            Chamber chamber = (Chamber) getPlayerRoom(player);
+            String wallLeft = (dungeon.getRoom(player.x-1, player.y) instanceof Wall) ? "0" : "1";
+            String wallTop = (dungeon.getRoom(player.x, player.y-1) instanceof Wall) ? "0" : "1";
+            String wallRight = (dungeon.getRoom(player.x+1, player.y) instanceof Wall) ? "0" : "1";
+            String values = wallLeft+wallTop+wallRight;
+            System.out.println("VALUES: "+values);
+            drawDungeon.setBackground("../ressources/room-"+values+".jpg");
+            System.out.println("../ressources/room-"+values+".jpg");
+            drawDungeon.draw();
+        }
+    }
 
     private Integer[] startingPosition(int cellSize) {
         Integer[] position = new Integer[2];
@@ -145,6 +158,7 @@ public class SceneController implements Initializable {
             }
             if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) { difficultyStrategy.doUpdateDifficulty(); }
             updateMiniMap();
+            updateDungeon();
             actionLog = new Text("<Moved to ("+player.x+", "+player.y+")>\n"); actionLog.setStyle("-fx-font-style: italic;");
         } catch (Exception e) {
             actionLog = new Text("You cannot pass a wall.\n"); actionLog.setStyle("-fx-font-style: italic;");
