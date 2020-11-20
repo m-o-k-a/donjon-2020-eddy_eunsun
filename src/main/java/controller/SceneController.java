@@ -59,39 +59,42 @@ public class SceneController implements Initializable {
     private ChestDrawable drawChest;
     private MonsterDrawable drawMonster;
     private DungeonDrawable drawDungeon;
+    private LogsDrawable drawLogs;
+    private InventoryInfo inventoryInfo;
+    private boolean showedtextfaceAMonster = false;
 
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //todo initialize dungeon
         cellSize = 40; //pls do not go above 50
         dungeon = new Dungeon(dungeonGenerator.generate(cellSize));
         difficultyStrategy = new SimpleDifficultyEnhance();
 
-        //todo character
         Integer[] position = startingPosition(cellSize);
-        player = entityFactory.createPlayer(position[0], position[1], 50, 10, "Warrior");
+        player = entityFactory.createPlayer(position[0], position[1], 1000, 10, "Warrior");
 
-        //todo refractor battle controller
         Rectangle playerLife = new Rectangle(lifebar.getPrefWidth(), lifebar.getPrefHeight(), Color.LIME);
         lifebar.getChildren().add(playerLife);
         if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) { difficultyStrategy.doUpdateDifficulty(); }
-        //initialize drawable
+
         drawMiniMap = new MiniMap(minimap, player, dungeon, cellSize);
         drawLifeBar = new LifeBar(playerLife, player, lifebar.getPrefWidth());
         drawChest = new ChestDrawable(spriteChest);
         drawMonster = new MonsterDrawable(spriteMonster, scene);
         //todo first image always wrong wtf hint: set with first image in constructor
+        //todo seems first room is always fucked up
         drawDungeon = new DungeonDrawable(scene);
+        drawLogs = new LogsDrawable(textLogsContent);
+        inventoryInfo = new InventoryInfo(weaponInfo, itemInfo, magicInfo, player.getInventory());
         update();
     }
 
     private void update() {
+        updateMonster(player.x, player.y);
+        updateChest(player.x, player.y);
         updateMiniMap();
         updateDungeon();
         updateLifeBar();
-        updateMonster(player.x, player.y);
-        updateChest(player.x, player.y);
         updateInventoryInfo();
     }
 
@@ -99,13 +102,13 @@ public class SceneController implements Initializable {
         drawMiniMap.draw();
     }
     private void updateLifeBar() { drawLifeBar.draw(); }
+    private void updateInventoryInfo() { inventoryInfo.draw(); }
     private void updateDungeon() {
         if(getPlayerRoom(player) instanceof Chamber) {
             String wallLeft = (dungeon.getRoom(player.x-1, player.y) instanceof Wall) ? "0" : "1";
             String wallTop = (dungeon.getRoom(player.x, player.y-1) instanceof Wall) ? "0" : "1";
             String wallRight = (dungeon.getRoom(player.x+1, player.y) instanceof Wall) ? "0" : "1";
             String values = wallLeft+wallTop+wallRight;
-            System.out.println("VALUES: "+values);
             drawDungeon.setBackground("../ressources/room-"+values+".jpg");
             drawDungeon.draw();
         }
@@ -121,29 +124,11 @@ public class SceneController implements Initializable {
         Chamber chamber = (Chamber) dungeon.getRoom(x, y);
         if(chamber.monster != null) {
             if(!chamber.monster.isDead()) {
-                addLogs(Color.RED, new Text("You face a "+chamber.monster.getName()+"\n"));
+                if(!showedtextfaceAMonster) { drawLogs.addLogs(Color.RED, new Text("You face a "+chamber.monster.getName()+"\n")); showedtextfaceAMonster = true; }
                 drawMonster.setMonster(chamber.monster);
                 drawMonster.draw();
-            } else { drawMonster.clear(); }
-        } else { drawMonster.clear(); }
-    }
-    private void updateInventoryInfo() {
-        weaponInfo.getChildren().clear(); itemInfo.getChildren().clear(); magicInfo.getChildren().clear();
-        if(player.getInventory().getWeapon() != null) {
-            Text weapon = new Text(player.getInventory().getWeapon().toString()+"\nDamages: "+player.getInventory().getWeapon().getDamages());
-            weapon.setFill(Color.WHITE);
-            weaponInfo.getChildren().add(weapon);
-        }
-        if(player.getInventory().getUsableItem() != null) {
-            Text item = new Text(player.getInventory().getUsableItem().toString()+"\nDamages: "+player.getInventory().getUsableItem().getDamages());
-            item.setFill(Color.WHITE);
-            itemInfo.getChildren().add(item);
-        }
-        if(player.getInventory().getMagic() != null) {
-            Text magic = new Text(player.getInventory().getMagic().toString()+"\nDamages: "+player.getInventory().getMagic().getDamages());
-            magic.setFill(Color.WHITE);
-            magicInfo.getChildren().add(magic);
-        }
+            } else { drawMonster.clear(); showedtextfaceAMonster = false;}
+        } else { drawMonster.clear(); showedtextfaceAMonster = false;}
     }
 
     private Integer[] startingPosition(int cellSize) {
@@ -203,8 +188,8 @@ public class SceneController implements Initializable {
         } catch (Exception e) {
             actionLog = new Text("You cannot pass a wall.\n"); actionLog.setStyle("-fx-font-style: italic;");
         }
+        drawLogs.addLogs(Color.WHITE, actionLog);
         update();
-        addLogs(Color.WHITE, actionLog);
         initBattle(getPlayerRoom(player));
     }
 
@@ -229,7 +214,7 @@ public class SceneController implements Initializable {
             Chamber playerChamber = (Chamber) getPlayerRoom(player);
             if(playerChamber.isBattle()) {
                 Text[] logs = playerChamber.battleTurn(action);
-                addLogs(Color.RED, logs);
+                drawLogs.addLogs(Color.RED, logs);
                 if(playerChamber.monster.isDead()) {
                     spriteMonster.setImage(null);
                 }
@@ -238,7 +223,7 @@ public class SceneController implements Initializable {
             else if(action == ActionDataBase.Action.ITEM && player.getInventory().getUsableItem() != null) {
                 if(player.getInventory().getUsableItem().getDamages() < 0) {
                     player.dammages(player.getInventory().getUsableItem().getDamages());
-                    addLogs(Color.RED, new Text("You Healed yourself using a "+player.getInventory().getUsableItem().toString()+"\n"));
+                    drawLogs.addLogs(Color.RED, new Text("You Healed yourself using a "+player.getInventory().getUsableItem().toString()+"\n"));
                     player.getInventory().setUsableItem(null);
                     haveNothing = false;
                 }
@@ -246,13 +231,13 @@ public class SceneController implements Initializable {
             else if(action == ActionDataBase.Action.MAGIC && player.getInventory().getMagic() != null) {
                 if(player.getInventory().getMagic().getDamages() < 0) {
                     player.dammages(player.getInventory().getMagic().getDamages());
-                    addLogs(Color.RED, new Text("You read the incantation in the "+player.getInventory().getMagic().getDamages()+" and healed yourself\n"));
+                    drawLogs.addLogs(Color.RED, new Text("You read the incantation in the "+player.getInventory().getMagic().getDamages()+" and healed yourself\n"));
                     player.getInventory().setMagic(null);
                     haveNothing = false;
                 }
             }
         }
-        if(haveNothing) { addLogs(Color.WHITE, new Text("You tried to damage the void, without success...\n")); }
+        if(haveNothing) { drawLogs.addLogs(Color.WHITE, new Text("You tried to damage the void, without success...\n")); }
         update();
     }
 
@@ -266,7 +251,7 @@ public class SceneController implements Initializable {
             Chamber room = (Chamber) getPlayerRoom(player);
             if(room.monster != null) {
                 if (!room.monster.isDead()) {
-                    addLogs(Color.WHITE, new Text("<You tried to communicate with the "+room.monster.getName()+" but all you could hear was incomprehensible noises>\n"));
+                    drawLogs.addLogs(Color.WHITE, new Text("<You tried to communicate with the "+room.monster.getName()+" but all you could hear was incomprehensible noises>\n"));
                     return;
                 }
             }
@@ -276,18 +261,7 @@ public class SceneController implements Initializable {
                 drawChest.draw(); }
             else { actionLog = new Text("<This room is all dark and lonely>\n"); }
         }
-        addLogs(Color.WHITE, actionLog);
+        drawLogs.addLogs(Color.WHITE, actionLog);
         update();
-    }
-
-    /**
-     * method that will add a log to the textFlow textLogsContent of the interface
-     * @param logs
-     */
-    private void addLogs(Color color, Text... logs) {
-        for(Text log : logs) {
-            log.setFill(color);
-            textLogsContent.getChildren().add(0, log);
-        }
     }
 }

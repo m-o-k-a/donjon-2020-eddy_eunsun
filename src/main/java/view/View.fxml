@@ -62,11 +62,17 @@
                            <viewport>
                               <Rectangle2D />
                            </viewport>
+                           <effect>
+                              <InnerShadow height="109.95" radius="52.932500000000005" width="103.78" />
+                           </effect>
                         </ImageView>
                         <ImageView fx:id="spriteMonster" fitHeight="396.0" fitWidth="396.0" layoutX="303.0" layoutY="41.0" nodeOrientation="INHERIT" pickOnBounds="true" preserveRatio="true">
                            <viewport>
                               <Rectangle2D />
                            </viewport>
+                           <effect>
+                              <InnerShadow height="106.75" radius="52.1325" width="103.78" />
+                           </effect>
                         </ImageView>
                      </children>
                      <effect>

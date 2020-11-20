@@ -31,19 +31,19 @@ public class ItemDataBase {
     private static ItemDataBase.magic getRandomMagic() { return randomEnum(ItemDataBase.magic.class); }
 
     public static Weapon generateWeapon(int difficulty) {
-        return itemFactory.createWeapon("God", random.nextInt(10*difficulty), getRandomWeapon());
+        return itemFactory.createWeapon("God", random.nextInt(5*difficulty)+difficulty, getRandomWeapon());
     }
 
     public static Magic generateMagic(int difficulty) {
         ItemDataBase.magic magicItem = getRandomMagic();
-        int damages = random.nextInt(20*difficulty);
+        int damages = random.nextInt(15*difficulty)+difficulty;
         if (magicItem == magic.Light) damages *=-1;
-        return itemFactory.createMagic("God", damages, magicItem);
+        return itemFactory.createMagic("Book", damages, magicItem);
     }
 
     public static UsableItem generateUsableItem(int difficulty) {
         ItemDataBase.usableItem item = getRandomUsableItem();
-        int damages = random.nextInt(15*difficulty);
+        int damages = random.nextInt(10*difficulty)+difficulty;
         if(item == usableItem.Potion) damages *=-1;
         return itemFactory.createUsableItem("God", damages, item);
     }

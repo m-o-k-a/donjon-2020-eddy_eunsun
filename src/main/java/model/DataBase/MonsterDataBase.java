@@ -13,7 +13,7 @@ public class MonsterDataBase {
     private static Random random = new Random();
 
     public enum monsters {
-        Slime, Skeleton, Ghost
+        bat, BlackKnight, Cockatorice, ghost, Goblin, Kobold, Mimic, Ork, Skeleton, Slime
     }
 
     public static String getSprite(monsters monster) {
@@ -26,7 +26,7 @@ public class MonsterDataBase {
 
     public static Monster generateMonster(int difficulty) {
         monsters monster = getRandomMonster();
-        return entityFactory.createMonster(monster, random.nextInt(50*difficulty), random.nextInt(5*difficulty), monster.toString());
+        return entityFactory.createMonster(monster, random.nextInt(10*difficulty)+difficulty, random.nextInt(5*difficulty)+difficulty, monster.toString());
     }
 
     private static <T extends Enum<?>> T randomEnum(Class<T> type){
