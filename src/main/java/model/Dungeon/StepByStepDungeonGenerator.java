@@ -42,7 +42,6 @@ public class StepByStepDungeonGenerator implements DungeonGenerator {
         int y = startingPosition[1];
         int step = 0;
         do {
-            System.out.println(x+" "+y);
             dungeon[x][y] = new Chamber();
             int tempx; int tempy;
             do {
@@ -51,7 +50,7 @@ public class StepByStepDungeonGenerator implements DungeonGenerator {
             } while (tempx == startingPosition[0] && tempy == startingPosition[1]);
             x = tempx; y = tempy;
             step++;
-        } while (step < maxStep && (x < cellSize - 1 || x > 0) && (y < cellSize - 1 || y > 0));
+        } while (step < maxStep && x < cellSize - 1 && x > 0 && y < cellSize - 1 && y > 0);
         dungeon[x][y] = new ExitRoom();
         System.out.println("STARTING: "+startingPosition[0]+" "+startingPosition[1]+" EXIT: "+x+" "+y);
     }

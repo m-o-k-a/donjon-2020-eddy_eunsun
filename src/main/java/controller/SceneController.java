@@ -156,7 +156,7 @@ public class SceneController implements Initializable {
      * @param action the enum value of the movement
      */
     private void actionMoveTo(ActionDataBase.Action action) {
-        if(player.isDead()) return;
+        if(player.isDead() || dungeon.isExited()) return;
         Text actionLog;
         Chamber actualChamber = ((Chamber) getPlayerRoom(player));
         if(actualChamber.isBattle()) {
@@ -179,7 +179,7 @@ public class SceneController implements Initializable {
         actionLog = new Text("<Moved to ("+player.x+", "+player.y+")>\n"); actionLog.setStyle("-fx-font-style: italic;");
         drawLogs.addLogs(Color.WHITE, actionLog);
         if (getPlayerRoom(player) instanceof ExitRoom) {
-            //faire des trucs
+            dungeon.setIsExited(true);
             drawLogs.addLogs(Color.GOLD, new Text("<VICTORY>\nYou succeed to exit the Dungeon !\nAs a reward you treat yourself with a whole Schwarzwälder Kirschtorte\n<PRESS INTERACT TO GO BACK TO TITLE SCREEN>\n"));
         }
         else if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) {
@@ -204,7 +204,7 @@ public class SceneController implements Initializable {
      */
     //todo refractor
     private void actionBattle(ActionDataBase.Action action) {
-        if(player.isDead()) return;
+        if(player.isDead() || dungeon.isExited()) return;
         boolean haveNothing = true;
         if ((getPlayerRoom(player) instanceof Chamber)) {
             Chamber playerChamber = (Chamber) getPlayerRoom(player);
@@ -241,7 +241,9 @@ public class SceneController implements Initializable {
      * method that will add an action log dedicated to interaction
      */
     private void actionInteract() {
-        if(player.isDead()) return;
+        if(player.isDead() || dungeon.isExited()) {
+            System.exit(0);
+        }
         Text actionLog = new Text("<You are not supposed to be there and you know it>\n");
         if(getPlayerRoom(player) instanceof Chamber) {
             Chamber room = (Chamber) getPlayerRoom(player);
