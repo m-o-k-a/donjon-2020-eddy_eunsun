@@ -12,10 +12,7 @@ import javafx.scene.text.TextFlow;
 import model.DataBase.ActionDataBase;
 import model.Difficulty.DifficultyStrategy;
 import model.Difficulty.SimpleDifficultyEnhance;
-import model.Dungeon.Dungeon;
-import model.Dungeon.DungeonGenerator;
-import model.Dungeon.NeverEndingDungeonGenerator;
-import model.Dungeon.StepByStepDungeonGenerator;
+import model.Dungeon.*;
 import model.Entity.EntityFactory;
 import model.Entity.Player;
 import model.Room.Chamber;
@@ -32,7 +29,7 @@ public class SceneController implements Initializable {
 
     private EntityFactory entityFactory = new EntityFactory();
     private Random random = new Random();
-    private DungeonGenerator dungeonGenerator = new StepByStepDungeonGenerator();
+    private DungeonGenerator dungeonGenerator = new EnhancedStepByStepDungeonGenerator();
     private DifficultyStrategy difficultyStrategy;
     private Dungeon dungeon;
     private Player player;
