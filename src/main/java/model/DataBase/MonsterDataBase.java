@@ -26,7 +26,7 @@ public class MonsterDataBase {
 
     public static Monster generateMonster(int difficulty) {
         monsters monster = getRandomMonster();
-        return entityFactory.createMonster(monster, random.nextInt(10*difficulty)+difficulty, random.nextInt(5*difficulty)+difficulty, monster.toString());
+        return entityFactory.createMonster(monster, random.nextInt(10*difficulty)+difficulty, random.nextInt(3*difficulty)+difficulty, monster.toString());
     }
 
     private static <T extends Enum<?>> T randomEnum(Class<T> type){

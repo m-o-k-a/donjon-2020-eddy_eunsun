@@ -3,30 +3,25 @@ package controller;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.InnerShadow;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
 import model.DataBase.ActionDataBase;
-import model.DataBase.MonsterDataBase;
 import model.Difficulty.DifficultyStrategy;
 import model.Difficulty.SimpleDifficultyEnhance;
 import model.Dungeon.Dungeon;
 import model.Dungeon.DungeonGenerator;
-import model.Entity.Chest;
+import model.Dungeon.NeverEndingDungeonGenerator;
+import model.Dungeon.StepByStepDungeonGenerator;
 import model.Entity.EntityFactory;
-import model.Entity.Monster;
 import model.Entity.Player;
 import model.Room.Chamber;
+import model.Room.ExitRoom;
 import model.Room.Room;
 import model.Room.Wall;
-import org.w3c.dom.css.Rect;
 import view.draw.*;
 
 import java.net.URL;
@@ -35,24 +30,23 @@ import java.util.ResourceBundle;
 
 public class SceneController implements Initializable {
 
-    EntityFactory entityFactory = new EntityFactory();
-    Random random = new Random();
-    DungeonGenerator dungeonGenerator = new DungeonGenerator();
-    DifficultyStrategy difficultyStrategy;
-    Dungeon dungeon;
-    Player player;
-    int cellSize;
+    private EntityFactory entityFactory = new EntityFactory();
+    private Random random = new Random();
+    private DungeonGenerator dungeonGenerator = new StepByStepDungeonGenerator();
+    private DifficultyStrategy difficultyStrategy;
+    private Dungeon dungeon;
+    private Player player;
+    private int cellSize;
 
-    @FXML GridPane dungeonGrid;
-    @FXML TextFlow textLogsContent;
-    @FXML Pane lifebar;
-    @FXML Canvas minimap;
-    @FXML ImageView spriteMonster;
-    @FXML ImageView spriteChest;
-    @FXML TextFlow weaponInfo;
-    @FXML TextFlow itemInfo;
-    @FXML TextFlow magicInfo;
-    @FXML Pane scene;
+    @FXML private TextFlow textLogsContent;
+    @FXML private Pane lifebar;
+    @FXML private Canvas minimap;
+    @FXML private ImageView spriteMonster;
+    @FXML private ImageView spriteChest;
+    @FXML private TextFlow weaponInfo;
+    @FXML private TextFlow itemInfo;
+    @FXML private TextFlow magicInfo;
+    @FXML private Pane scene;
 
     private MiniMap drawMiniMap;
     private LifeBar drawLifeBar;
@@ -70,7 +64,7 @@ public class SceneController implements Initializable {
         dungeon = new Dungeon(dungeonGenerator.generate(cellSize));
         difficultyStrategy = new SimpleDifficultyEnhance();
 
-        Integer[] position = startingPosition(cellSize);
+        Integer[] position = dungeonGenerator.getStartingPosition();
         player = entityFactory.createPlayer(position[0], position[1], 1000, 10, "Warrior");
 
         Rectangle playerLife = new Rectangle(lifebar.getPrefWidth(), lifebar.getPrefHeight(), Color.LIME);
@@ -104,41 +98,40 @@ public class SceneController implements Initializable {
     private void updateLifeBar() { drawLifeBar.draw(); }
     private void updateInventoryInfo() { inventoryInfo.draw(); }
     private void updateDungeon() {
-        if(getPlayerRoom(player) instanceof Chamber) {
+        if(getPlayerRoom(player) instanceof ExitRoom) {
+            drawDungeon.setBackground("../ressources/room-final.jpg");
+        }
+        else if(getPlayerRoom(player) instanceof Chamber) {
             String wallLeft = (dungeon.getRoom(player.x-1, player.y) instanceof Wall) ? "0" : "1";
             String wallTop = (dungeon.getRoom(player.x, player.y-1) instanceof Wall) ? "0" : "1";
             String wallRight = (dungeon.getRoom(player.x+1, player.y) instanceof Wall) ? "0" : "1";
             String values = wallLeft+wallTop+wallRight;
             drawDungeon.setBackground("../ressources/room-"+values+".jpg");
-            drawDungeon.draw();
         }
+        drawDungeon.draw();
     }
     private void updateChest(int x, int y) {
-        Chamber chamber = (Chamber) dungeon.getRoom(x, y);
-        if(chamber.chest != null) {
-            drawChest.setChest(chamber.chest);
-            drawChest.draw();
-        } else { drawChest.clear(); }
+        drawChest.clear();
+        if(getPlayerRoom(player) instanceof Chamber) {
+            Chamber chamber = (Chamber) dungeon.getRoom(x, y);
+            if(chamber.chest != null) {
+                drawChest.setChest(chamber.chest);
+                drawChest.draw();
+            }
+        }
     }
     private void updateMonster(int x, int y) {
-        Chamber chamber = (Chamber) dungeon.getRoom(x, y);
-        if(chamber.monster != null) {
-            if(!chamber.monster.isDead()) {
-                if(!showedtextfaceAMonster) { drawLogs.addLogs(Color.RED, new Text("You face a "+chamber.monster.getName()+"\n")); showedtextfaceAMonster = true; }
-                drawMonster.setMonster(chamber.monster);
-                drawMonster.draw();
-            } else { drawMonster.clear(); showedtextfaceAMonster = false;}
-        } else { drawMonster.clear(); showedtextfaceAMonster = false;}
-    }
-
-    private Integer[] startingPosition(int cellSize) {
-        Integer[] position = new Integer[2];
-        int x; int y;
-        do {
-            x = random.nextInt(cellSize); y = random.nextInt(cellSize);
-        } while(dungeon.getRoom(x, y) != null && (dungeon.getRoom(x, y) instanceof Wall));
-        position[0] = x; position[1] = y;
-        return position;
+        drawMonster.clear();
+        if(getPlayerRoom(player) instanceof Chamber) {
+            Chamber chamber = (Chamber) dungeon.getRoom(x, y);
+            if(chamber.monster != null) {
+                if(!chamber.monster.isDead()) {
+                    if(!showedtextfaceAMonster) { drawLogs.addLogs(Color.RED, new Text("You face a "+chamber.monster.getName()+"\n")); showedtextfaceAMonster = true; }
+                    drawMonster.setMonster(chamber.monster);
+                    drawMonster.draw();
+                } else {showedtextfaceAMonster = false;}
+            } else {showedtextfaceAMonster = false;}
+        }
     }
 
     private Room getPlayerRoom(Player player) {
@@ -170,27 +163,30 @@ public class SceneController implements Initializable {
             actionBattle(action);
             return;
         }
-        try {
-            Integer[] lastPosition = new Integer[2]; lastPosition[0] = player.x; lastPosition[1] = player.y;
-            switch (action) {
-                case UP:  player.goUp(); break;
-                case DOWN: player.goDown(); break;
-                case LEFT: player.goLeft(); break;
-                case RIGHT: player.goRight(); break;
-                default: return;
-            }
-            if (getPlayerRoom(player) instanceof Wall) {
-                player.x = lastPosition[0]; player.y = lastPosition[1];
-                throw new Exception();
-            }
-            if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) { difficultyStrategy.doUpdateDifficulty(); }
-            actionLog = new Text("<Moved to ("+player.x+", "+player.y+")>\n"); actionLog.setStyle("-fx-font-style: italic;");
-        } catch (Exception e) {
-            actionLog = new Text("You cannot pass a wall.\n"); actionLog.setStyle("-fx-font-style: italic;");
+        Integer[] lastPosition = new Integer[2]; lastPosition[0] = player.x; lastPosition[1] = player.y;
+        switch (action) {
+            case UP:  player.goUp(); break;
+            case DOWN: player.goDown(); break;
+            case LEFT: player.goLeft(); break;
+            case RIGHT: player.goRight(); break;
+            default: return;
         }
+        if (getPlayerRoom(player) instanceof Wall) {
+            player.x = lastPosition[0]; player.y = lastPosition[1];
+            actionLog = new Text("You cannot pass a wall.\n"); actionLog.setStyle("-fx-font-style: italic;");
+            return;
+        }
+        actionLog = new Text("<Moved to ("+player.x+", "+player.y+")>\n"); actionLog.setStyle("-fx-font-style: italic;");
         drawLogs.addLogs(Color.WHITE, actionLog);
+        if (getPlayerRoom(player) instanceof ExitRoom) {
+            //faire des trucs
+            drawLogs.addLogs(Color.GOLD, new Text("<VICTORY>\nYou succeed to exit the Dungeon !\nAs a reward you treat yourself with a whole Schwarzwälder Kirschtorte\n<PRESS INTERACT TO GO BACK TO TITLE SCREEN>\n"));
+        }
+        else if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) {
+            difficultyStrategy.doUpdateDifficulty();
+            initBattle(getPlayerRoom(player));
+        }
         update();
-        initBattle(getPlayerRoom(player));
     }
 
     private void initBattle(Room playerRoom) {

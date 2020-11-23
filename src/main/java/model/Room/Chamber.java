@@ -14,21 +14,13 @@ import model.Item.ItemFactory;
 import java.util.Random;
 
 public class Chamber implements  Room {
-    public boolean[] openedDoors;
     Random random = new Random();
-    private boolean isFinal;
     public boolean isVisited;
     private int difficulty;
 
     private Battle battle = null;
     public Monster monster = null;
     public Chest chest = null;
-
-    public Chamber(boolean[] openedDoors, boolean isFinal) {
-        isVisited = false;
-        this.openedDoors = openedDoors;
-        this.isFinal = isFinal;
-    }
 
     public Boolean InitializeRoom(int difficulty) {
         if(isVisited) return false;
@@ -56,7 +48,6 @@ public class Chamber implements  Room {
     }
 
     private void fillChamber() {
-        if(isFinal) return;
         if(random.nextInt(101)%5 == 0) { monster = MonsterDataBase.generateMonster(difficulty); }
         if(random.nextInt(101)%3 == 0) {
             //todo generate lot of possibilities

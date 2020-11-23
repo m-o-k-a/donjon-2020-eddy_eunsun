@@ -6,6 +6,7 @@ import javafx.scene.paint.Color;
 import model.Dungeon.Dungeon;
 import model.Entity.Player;
 import model.Room.Chamber;
+import model.Room.ExitRoom;
 import model.Room.Wall;
 
 public class MiniMap implements Drawable {
@@ -67,5 +68,12 @@ public class MiniMap implements Drawable {
         if(dungeon.getRoom(x, y-1) instanceof Wall) { drawMiniMapCell(minimap, Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x, y-1);}
         if(dungeon.getRoom(x+1, y) instanceof Wall) { drawMiniMapCell(minimap, Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x+1, y);}
         if(dungeon.getRoom(x, y+1) instanceof Wall) { drawMiniMapCell(minimap, Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x, y+1);}
+    }
+
+    private void drawExit(Dungeon dungeon, int x, int y) {
+        if(dungeon.getRoom(x-1, y) instanceof ExitRoom) { drawMiniMapCell(minimap, Color.GOLD, (int)(minimap.getWidth()/cellSize), x-1, y);}
+        else if(dungeon.getRoom(x, y-1) instanceof ExitRoom) { drawMiniMapCell(minimap, Color.GOLD, (int)(minimap.getWidth()/cellSize), x, y-1);}
+        else if(dungeon.getRoom(x+1, y) instanceof ExitRoom) { drawMiniMapCell(minimap, Color.GOLD, (int)(minimap.getWidth()/cellSize), x+1, y);}
+        else if(dungeon.getRoom(x, y+1) instanceof ExitRoom) { drawMiniMapCell(minimap, Color.GOLD, (int)(minimap.getWidth()/cellSize), x, y+1);}
     }
 }
