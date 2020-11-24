@@ -16,7 +16,7 @@ public class Monster extends Characters {
     }
 
     public ActionDataBase.Action selectAction() {
-        //only attack
+        //only attack, may have more later
         return ActionDataBase.Action.ATTACK;
     }
 }

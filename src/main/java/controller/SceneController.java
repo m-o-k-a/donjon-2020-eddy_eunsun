@@ -9,26 +9,20 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextFlow;
-import model.DataBase.ActionDataBase;
-import model.Difficulty.DifficultyStrategy;
-import model.Difficulty.SimpleDifficultyEnhance;
+import model.DataBase.*;
+import model.Difficulty.*;
 import model.Dungeon.*;
 import model.Entity.EntityFactory;
 import model.Entity.Player;
-import model.Room.Chamber;
-import model.Room.ExitRoom;
-import model.Room.Room;
-import model.Room.Wall;
+import model.Room.*;
 import view.draw.*;
 
 import java.net.URL;
-import java.util.Random;
 import java.util.ResourceBundle;
 
 public class SceneController implements Initializable {
 
     private EntityFactory entityFactory = new EntityFactory();
-    private Random random = new Random();
     private DungeonGenerator dungeonGenerator = new EnhancedStepByStepDungeonGenerator();
     private DifficultyStrategy difficultyStrategy;
     private Dungeon dungeon;
@@ -72,11 +66,10 @@ public class SceneController implements Initializable {
         drawLifeBar = new LifeBar(playerLife, player, lifebar.getPrefWidth());
         drawChest = new ChestDrawable(spriteChest);
         drawMonster = new MonsterDrawable(spriteMonster, scene);
-        //todo first image always wrong wtf hint: set with first image in constructor
-        //todo seems first room is always fucked up
         drawDungeon = new DungeonDrawable(scene);
         drawLogs = new LogsDrawable(textLogsContent);
         inventoryInfo = new InventoryInfo(weaponInfo, itemInfo, magicInfo, player.getInventory());
+        drawLogs.addLogs(Color.WHITE, new Text("Thee did wake up in a dark dungeon where danger is in every room....\n"));
         update();
     }
 
@@ -123,7 +116,7 @@ public class SceneController implements Initializable {
             Chamber chamber = (Chamber) dungeon.getRoom(x, y);
             if(chamber.monster != null) {
                 if(!chamber.monster.isDead()) {
-                    if(!showedtextfaceAMonster) { drawLogs.addLogs(Color.RED, new Text("You face a "+chamber.monster.getName()+"\n")); showedtextfaceAMonster = true; }
+                    if(!showedtextfaceAMonster) { drawLogs.addLogs(Color.RED, new Text("Thee face a "+chamber.monster.getName()+"\n")); showedtextfaceAMonster = true; }
                     drawMonster.setMonster(chamber.monster);
                     drawMonster.draw();
                 } else {showedtextfaceAMonster = false;}
@@ -170,16 +163,16 @@ public class SceneController implements Initializable {
         }
         if (getPlayerRoom(player) instanceof Wall) {
             player.x = lastPosition[0]; player.y = lastPosition[1];
-            actionLog = new Text("You cannot pass a wall.\n"); actionLog.setStyle("-fx-font-style: italic;");
+            drawLogs.addLogs(Color.WHITE, new Text("<Thee cannot passeth a wall>\n"));
             return;
         }
-        actionLog = new Text("<Moved to ("+player.x+", "+player.y+")>\n"); actionLog.setStyle("-fx-font-style: italic;");
-        drawLogs.addLogs(Color.WHITE, actionLog);
+        drawLogs.addLogs(Color.WHITE, new Text("<Thee hath moved to ("+player.x+", "+player.y+")>\n"));
         if (getPlayerRoom(player) instanceof ExitRoom) {
             dungeon.setIsExited(true);
-            drawLogs.addLogs(Color.GOLD, new Text("<VICTORY>\nYou succeed to exit the Dungeon !\nAs a reward you treat yourself with a whole Schwarzwälder Kirschtorte\n<PRESS INTERACT TO GO BACK TO TITLE SCREEN>\n"));
+            drawLogs.addLogs(Color.GOLD, new Text("<VICTORY>\nThee succeedeth to exit the dungeon !\n" +
+                    "as a reward thee treateth yourself with a whole schwarzwäld'r kirscht'rte\n<PRESS INTERACT TO GO BACK TO TITLE SCREEN>\n"));
         }
-        else if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) {
+        if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) {
             difficultyStrategy.doUpdateDifficulty();
             initBattle(getPlayerRoom(player));
         }
@@ -209,14 +202,14 @@ public class SceneController implements Initializable {
                 Text[] logs = playerChamber.battleTurn(action);
                 drawLogs.addLogs(Color.RED, logs);
                 if(playerChamber.monster.isDead()) {
-                    spriteMonster.setImage(null);
+                    drawMonster.setMonster(null);
                 }
                 haveNothing = false;
             }
             else if(action == ActionDataBase.Action.ITEM && player.getInventory().getUsableItem() != null) {
                 if(player.getInventory().getUsableItem().getDamages() < 0) {
                     player.dammages(player.getInventory().getUsableItem().getDamages());
-                    drawLogs.addLogs(Color.RED, new Text("You Healed yourself using a "+player.getInventory().getUsableItem().toString()+"\n"));
+                    drawLogs.addLogs(Color.RED, new Text("Thee did heal yourself using a "+player.getInventory().getUsableItem().toString()+"\n"));
                     player.getInventory().setUsableItem(null);
                     haveNothing = false;
                 }
@@ -224,13 +217,13 @@ public class SceneController implements Initializable {
             else if(action == ActionDataBase.Action.MAGIC && player.getInventory().getMagic() != null) {
                 if(player.getInventory().getMagic().getDamages() < 0) {
                     player.dammages(player.getInventory().getMagic().getDamages());
-                    drawLogs.addLogs(Color.RED, new Text("You read the incantation in the "+player.getInventory().getMagic().getDamages()+" and healed yourself\n"));
+                    drawLogs.addLogs(Color.RED, new Text("Thee readeth the incantation in the "+player.getInventory().getMagic().getDamages()+" and healed theeself\n"));
                     player.getInventory().setMagic(null);
                     haveNothing = false;
                 }
             }
         }
-        if(haveNothing) { drawLogs.addLogs(Color.WHITE, new Text("You tried to damage the void, without success...\n")); }
+        if(haveNothing) { drawLogs.addLogs(Color.WHITE, new Text("Thee hath tried to damageth the void, without success...\n")); }
         update();
     }
 
@@ -241,12 +234,12 @@ public class SceneController implements Initializable {
         if(player.isDead() || dungeon.isExited()) {
             System.exit(0);
         }
-        Text actionLog = new Text("<You are not supposed to be there and you know it>\n");
+        Text actionLog = new Text("<Thou art not did suppose to beest there and thee knoweth't>\n");
         if(getPlayerRoom(player) instanceof Chamber) {
             Chamber room = (Chamber) getPlayerRoom(player);
             if(room.monster != null) {
                 if (!room.monster.isDead()) {
-                    drawLogs.addLogs(Color.WHITE, new Text("<You tried to communicate with the "+room.monster.getName()+" but all you could hear was incomprehensible noises>\n"));
+                    drawLogs.addLogs(Color.WHITE, new Text("<Thee hath tried to communicateth with the "+room.monster.getName()+" but all thee couldst heareth wast incomprehensible noises>\n"));
                     return;
                 }
             }

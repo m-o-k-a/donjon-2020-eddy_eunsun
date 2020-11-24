@@ -45,8 +45,8 @@ public class Chest implements Entity {
 
     //todo logger ?
     private Text chestLog(Item itemFrom, Item itemTo) {
-        if(itemFrom == null) { return new Text("<You take the "+itemTo.toString()+" from the chest>\n"); }
-        else if(itemTo == null) { return new Text("<You drop the "+itemFrom.toString()+" in the chest>\n"); }
-        else { return new Text("<You take the "+itemTo.toString()+" from the chest, you drop the "+itemFrom.toString()+" in the chest>\n"); }
+        if(itemFrom == null) { return new Text("<Thee taketh the "+itemTo.toString()+" from the chest>\n"); }
+        else if(itemTo == null) { return new Text("<Thee dropeth the "+itemFrom.toString()+" in the chest>\n"); }
+        else { return new Text("<Thee taketh the "+itemTo.toString()+" from the chest, Thee dropeth the "+itemFrom.toString()+" in the chest>\n"); }
     }
 }
