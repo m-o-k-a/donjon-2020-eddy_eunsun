@@ -69,7 +69,7 @@ public class SceneController implements Initializable {
         drawDungeon = new DungeonDrawable(scene);
         drawLogs = new LogsDrawable(textLogsContent);
         inventoryInfo = new InventoryInfo(weaponInfo, itemInfo, magicInfo, player.getInventory());
-        drawLogs.addLogs(Color.WHITE, new Text("Thee did wake up in a dark dungeon where danger is in every room....\n"));
+        drawLogs.addLogs(Color.WHITE, new Text("Thou didst wake up in a dark dungeon where danger lies in every room....\n"));
         update();
     }
 
@@ -88,7 +88,7 @@ public class SceneController implements Initializable {
     private void updateLifeBar() { drawLifeBar.draw(); }
     private void updateInventoryInfo() { inventoryInfo.draw(); }
     private void updateDungeon() {
-        if(getPlayerRoom(player) instanceof ExitRoom) {
+        if(getPlayerRoom(player) instanceof ExitRoom || dungeon.isExited()) {
             drawDungeon.setBackground("../ressources/room-final.jpg");
         }
         else if(getPlayerRoom(player) instanceof Chamber) {
@@ -116,7 +116,7 @@ public class SceneController implements Initializable {
             Chamber chamber = (Chamber) dungeon.getRoom(x, y);
             if(chamber.monster != null) {
                 if(!chamber.monster.isDead()) {
-                    if(!showedtextfaceAMonster) { drawLogs.addLogs(Color.RED, new Text("Thee face a "+chamber.monster.getName()+"\n")); showedtextfaceAMonster = true; }
+                    if(!showedtextfaceAMonster) { drawLogs.addLogs(Color.RED, new Text("Thou face a "+chamber.monster.getName()+"\n")); showedtextfaceAMonster = true; }
                     drawMonster.setMonster(chamber.monster);
                     drawMonster.draw();
                 } else {showedtextfaceAMonster = false;}
@@ -147,7 +147,6 @@ public class SceneController implements Initializable {
      */
     private void actionMoveTo(ActionDataBase.Action action) {
         if(player.isDead() || dungeon.isExited()) return;
-        Text actionLog;
         Chamber actualChamber = ((Chamber) getPlayerRoom(player));
         if(actualChamber.isBattle()) {
             actionBattle(action);
@@ -163,16 +162,16 @@ public class SceneController implements Initializable {
         }
         if (getPlayerRoom(player) instanceof Wall) {
             player.x = lastPosition[0]; player.y = lastPosition[1];
-            drawLogs.addLogs(Color.WHITE, new Text("<Thee cannot passeth a wall>\n"));
+            drawLogs.addLogs(Color.WHITE, new Text("<Thou cannot pass a wall>\n"));
             return;
         }
-        drawLogs.addLogs(Color.WHITE, new Text("<Thee hath moved to ("+player.x+", "+player.y+")>\n"));
+        drawLogs.addLogs(Color.WHITE, new Text("<Thou hast moved to ("+player.x+", "+player.y+")>\n"));
         if (getPlayerRoom(player) instanceof ExitRoom) {
             dungeon.setIsExited(true);
-            drawLogs.addLogs(Color.GOLD, new Text("<VICTORY>\nThee succeedeth to exit the dungeon !\n" +
-                    "as a reward thee treateth yourself with a whole schwarzwäld'r kirscht'rte\n<PRESS INTERACT TO GO BACK TO TITLE SCREEN>\n"));
+            drawLogs.addLogs(Color.GOLD, new Text("<VICTORY>\nThou succeed to exit the dungeon in "+(difficultyStrategy.getDifficulty())+" move !\n" +
+                    "as a reward thou treat yourself with a whole Schwarzwälder Kirschtorte\n<PRESS INTERACT TO GO BACK TO TITLE SCREEN>\n"));
         }
-        if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) {
+        else if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) {
             difficultyStrategy.doUpdateDifficulty();
             initBattle(getPlayerRoom(player));
         }
@@ -209,7 +208,7 @@ public class SceneController implements Initializable {
             else if(action == ActionDataBase.Action.ITEM && player.getInventory().getUsableItem() != null) {
                 if(player.getInventory().getUsableItem().getDamages() < 0) {
                     player.dammages(player.getInventory().getUsableItem().getDamages());
-                    drawLogs.addLogs(Color.RED, new Text("Thee did heal yourself using a "+player.getInventory().getUsableItem().toString()+"\n"));
+                    drawLogs.addLogs(Color.RED, new Text("Thou didst heal yourself using a "+player.getInventory().getUsableItem().toString()+"\n"));
                     player.getInventory().setUsableItem(null);
                     haveNothing = false;
                 }
@@ -217,13 +216,13 @@ public class SceneController implements Initializable {
             else if(action == ActionDataBase.Action.MAGIC && player.getInventory().getMagic() != null) {
                 if(player.getInventory().getMagic().getDamages() < 0) {
                     player.dammages(player.getInventory().getMagic().getDamages());
-                    drawLogs.addLogs(Color.RED, new Text("Thee readeth the incantation in the "+player.getInventory().getMagic().getDamages()+" and healed theeself\n"));
+                    drawLogs.addLogs(Color.RED, new Text("Thou read the incantation in the "+player.getInventory().getMagic().getDamages()+" and healed thyself\n"));
                     player.getInventory().setMagic(null);
                     haveNothing = false;
                 }
             }
         }
-        if(haveNothing) { drawLogs.addLogs(Color.WHITE, new Text("Thee hath tried to damageth the void, without success...\n")); }
+        if(haveNothing) { drawLogs.addLogs(Color.WHITE, new Text("Thou hast tried to damage the void, without success...\n")); }
         update();
     }
 
@@ -234,12 +233,12 @@ public class SceneController implements Initializable {
         if(player.isDead() || dungeon.isExited()) {
             System.exit(0);
         }
-        Text actionLog = new Text("<Thou art not did suppose to beest there and thee knoweth't>\n");
+        Text actionLog = new Text("<Thou art not did suppose to be there and thee know it>\n");
         if(getPlayerRoom(player) instanceof Chamber) {
             Chamber room = (Chamber) getPlayerRoom(player);
             if(room.monster != null) {
                 if (!room.monster.isDead()) {
-                    drawLogs.addLogs(Color.WHITE, new Text("<Thee hath tried to communicateth with the "+room.monster.getName()+" but all thee couldst heareth wast incomprehensible noises>\n"));
+                    drawLogs.addLogs(Color.WHITE, new Text("<Thou hast tried to communicate with the "+room.monster.getName()+" but all thou could hear wast incomprehensible noises>\n"));
                     return;
                 }
             }

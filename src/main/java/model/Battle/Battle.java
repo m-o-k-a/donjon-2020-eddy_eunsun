@@ -28,26 +28,26 @@ public class Battle {
     }
 
     private Text playerTurn(ActionDataBase.Action playerAction) {
-        Text playerLog = new Text("Thee didst nothing, waiting for thy owneth death\n");
+        Text playerLog = new Text("Thou didst nothing, waiting for thy own death\n");
         switch (playerAction) {
             case UP:
             case LEFT:
             case DOWN:
             case RIGHT:
-                playerLog = new Text("Thee cannot escapeth from thee owneth death\n");
+                playerLog = new Text("Thou cannot escape from thou own death\n");
                 break;
             case ATTACK:
                 int damages = updateMonsterHealth(monster, (player.getStrength() + (player.getInventory().getWeapon() == null ? 0 : player.getInventory().getWeapon().getDamages())));
-                playerLog = new Text("Thee did attack the "+monster.type()+" It loses "+damages+" Health\n");
+                playerLog = new Text("Thou didst attack the "+monster.type()+" It loses "+damages+" Health\n");
                 break;
             case ITEM:
                 UsableItem item = player.getInventory().getUsableItem();
                 if(item.getDamages() < 0) {
                     updatePlayerHealth(player, item.getDamages());
-                    playerLog = new Text("Thee did heal yourself using a "+item.toString()+"\n");
+                    playerLog = new Text("Thou didst heal yourself using a "+item.toString()+"\n");
                 } else {
                     updateMonsterHealth(monster, item.getDamages());
-                    playerLog = new Text("Thee did throw a "+item.toString()+" on the "+monster.type()+". It inflicted "+item.getDamages()+" damages\n");
+                    playerLog = new Text("Thou didst throw a "+item.toString()+" on the "+monster.type()+". It inflicted "+item.getDamages()+" damages\n");
                 }
                 player.getInventory().setUsableItem(null);
                 break;
@@ -55,10 +55,10 @@ public class Battle {
                 Magic magic = player.getInventory().getMagic();
                 if(magic.getDamages() < 0) {
                     updatePlayerHealth(player, magic.getDamages());
-                    playerLog = new Text("Thee readeth the incantation in the "+player.getInventory().getMagic().getDamages()+" and healed theeself\n");
+                    playerLog = new Text("Thou read the incantation in the "+player.getInventory().getMagic().getDamages()+" and healed thyself\n");
                 } else {
                     updateMonsterHealth(monster, magic.getDamages());
-                    playerLog = new Text("Thee readeth the incantation in the "+magic.toString()+" and inflicted "+magic.getDamages()+" damages to the "+monster.type()+"\n");
+                    playerLog = new Text("Thou read the incantation in the "+magic.toString()+" and inflicted "+magic.getDamages()+" damages to the "+monster.type()+"\n");
                 }
                 player.getInventory().setMagic(null);
             default:
@@ -72,7 +72,7 @@ public class Battle {
         switch (monsterAction) {
             case ATTACK:
                 int damages = updatePlayerHealth(player, monster.getStrength());
-                monsterLog = new Text("The "+monster.type()+" Attacked thee ! Thee lose "+damages+" Health\n");
+                monsterLog = new Text("The "+monster.type()+" Attacked thee ! Thou lose "+damages+" Health\n");
                 break;
             default:
                 break;
