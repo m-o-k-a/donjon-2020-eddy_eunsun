@@ -5,7 +5,6 @@ import model.Room.ExitRoom;
 import model.Room.Room;
 import model.Room.Wall;
 
-import java.util.List;
 import java.util.Random;
 
 public class EnhancedStepByStepDungeonGenerator implements DungeonGenerator {

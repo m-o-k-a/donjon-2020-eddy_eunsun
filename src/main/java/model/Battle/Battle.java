@@ -22,7 +22,7 @@ public class Battle {
         if(monster.isDead()) { battleLogs[1] = new Text("The "+monster.type()+" is defeated\n"); }
         else {
             battleLogs[1] = monsterTurn(monsterAction);
-            if(player.isDead()) { battleLogs[2] = new Text("<GAME OVER>\n<PRESS INTERACT TO GO BACK TO TITLE SCREEN>\nThe "+monster.type()+" hath killed thee\n"); }
+            if(player.isDead()) { battleLogs[2] = new Text("<GAME OVER>\n<PRESS INTERACT TO GO BACK TO TITLE SCREEN>\nThe "+monster.type()+" hast killed thee\n"); }
         }
         return battleLogs;
     }
@@ -38,7 +38,7 @@ public class Battle {
                 break;
             case ATTACK:
                 int damages = updateMonsterHealth(monster, (player.getStrength() + (player.getInventory().getWeapon() == null ? 0 : player.getInventory().getWeapon().getDamages())));
-                playerLog = new Text("Thou didst attack the "+monster.type()+" It loses "+damages+" Health\n");
+                playerLog = new Text("Thou didst attack the "+monster.type()+". It loses "+damages+" Health\n");
                 break;
             case ITEM:
                 UsableItem item = player.getInventory().getUsableItem();

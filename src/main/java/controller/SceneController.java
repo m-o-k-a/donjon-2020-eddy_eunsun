@@ -51,12 +51,12 @@ public class SceneController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        cellSize = 40; //pls do not go above 50
+        cellSize = 50; //pls do not go above 50
         dungeon = new Dungeon(dungeonGenerator.generate(cellSize));
         difficultyStrategy = new SimpleDifficultyEnhance();
 
         Integer[] position = dungeonGenerator.getStartingPosition();
-        player = entityFactory.createPlayer(position[0], position[1], 1000, 10, "Warrior");
+        player = entityFactory.createPlayer(position[0], position[1], 1000, 10, "Adventurer");
 
         Rectangle playerLife = new Rectangle(lifebar.getPrefWidth(), lifebar.getPrefHeight(), Color.LIME);
         lifebar.getChildren().add(playerLife);
@@ -168,7 +168,7 @@ public class SceneController implements Initializable {
         drawLogs.addLogs(Color.WHITE, new Text("<Thou hast moved to ("+player.x+", "+player.y+")>\n"));
         if (getPlayerRoom(player) instanceof ExitRoom) {
             dungeon.setIsExited(true);
-            drawLogs.addLogs(Color.GOLD, new Text("<VICTORY>\nThou succeed to exit the dungeon in "+(difficultyStrategy.getDifficulty())+" move !\n" +
+            drawLogs.addLogs(Color.GOLD, new Text("<VICTORY>\nThou succeed to exit the dungeon !\n" +
                     "as a reward thou treat yourself with a whole Schwarzwälder Kirschtorte\n<PRESS INTERACT TO GO BACK TO TITLE SCREEN>\n"));
         }
         else if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) {
