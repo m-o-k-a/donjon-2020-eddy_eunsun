@@ -20,13 +20,9 @@ public abstract class Characters implements Entity {
 
     public void dammages(int dammages) {
         health -= dammages;
-        if(health > maxHealth) this.health = maxHealth;
+        //if(health > maxHealth) this.health = maxHealth; //comment to allows player to heal theeself more and hence gain hp
+        if(health>maxHealth) {maxHealth = health;} //uncomment to allows player to heal theeself more and hence gain hp
     }
 
     public boolean isDead() { return health<=0; }
-
-    public void useAttack(Characters target) {
-        dammages(this.strength);
-    }
-
 }

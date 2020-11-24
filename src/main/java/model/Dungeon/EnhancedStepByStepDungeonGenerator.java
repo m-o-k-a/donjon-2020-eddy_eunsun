@@ -41,9 +41,11 @@ public class EnhancedStepByStepDungeonGenerator implements DungeonGenerator {
     private void stepUntil(int maxStep) {
         int x = startingPosition[0];
         int y = startingPosition[1];
+        Chamber startingChamber = new Chamber(); startingChamber.InitializeRoom(1);
+        startingChamber.monster = null; startingChamber.chest = null;
+        dungeon[x][y] = startingChamber;
         int step = 0;
         do {
-            dungeon[x][y] = new Chamber();
             int tempx; int tempy;
             int subStep = cellSize;
             do {
@@ -52,6 +54,7 @@ public class EnhancedStepByStepDungeonGenerator implements DungeonGenerator {
                 subStep--;
             } while (subStep != 0 && dungeon[x][y] instanceof Room);
             x = tempx; y = tempy;
+            dungeon[x][y] = new Chamber();
             step++;
         } while (step < maxStep && x < cellSize - 1 && x > 0 && y < cellSize - 1 && y > 0);
         dungeon[x][y] = new ExitRoom();
