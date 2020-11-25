@@ -67,16 +67,16 @@ public class MiniMap implements Drawable {
 
     private void drawWalls(Dungeon dungeon, int x, int y) {
         if(x!=0) {
-            if(dungeon.getRoom(x-1, y) instanceof Wall) { drawMiniMapCell(minimap, Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x-1, y);}
+            if(dungeon.getRoom(x-1, y) instanceof Wall) { drawMiniMapCell(minimap, Color.CRIMSON, (int)(minimap.getWidth()/cellSize), x-1, y);}
         }
         if(y!=0) {
-            if(dungeon.getRoom(x, y-1) instanceof Wall) { drawMiniMapCell(minimap, Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x, y-1);}
+            if(dungeon.getRoom(x, y-1) instanceof Wall) { drawMiniMapCell(minimap, Color.CRIMSON, (int)(minimap.getWidth()/cellSize), x, y-1);}
         }
         if(x!=cellSize-1) {
-            if(dungeon.getRoom(x+1, y) instanceof Wall) { drawMiniMapCell(minimap, Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x+1, y);}
+            if(dungeon.getRoom(x+1, y) instanceof Wall) { drawMiniMapCell(minimap, Color.CRIMSON, (int)(minimap.getWidth()/cellSize), x+1, y);}
         }
         if(y!=cellSize-1) {
-            if(dungeon.getRoom(x, y+1) instanceof Wall) { drawMiniMapCell(minimap, Color.DARKBLUE, (int)(minimap.getWidth()/cellSize), x, y+1);}
+            if(dungeon.getRoom(x, y+1) instanceof Wall) { drawMiniMapCell(minimap, Color.CRIMSON, (int)(minimap.getWidth()/cellSize), x, y+1);}
         }
     }
 

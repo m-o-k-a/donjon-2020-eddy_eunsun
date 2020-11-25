@@ -71,7 +71,7 @@
                               <Rectangle2D />
                            </viewport>
                            <effect>
-                              <InnerShadow height="106.75" radius="52.1325" width="103.78" />
+                              <InnerShadow height="83.02" radius="49.905" width="118.6" />
                            </effect>
                         </ImageView>
                      </children>
