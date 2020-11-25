@@ -14,8 +14,12 @@ public class StepByStepDungeonGenerator implements DungeonGenerator {
     private Integer[] startingPosition;
     private int cellSize;
 
+    public StepByStepDungeonGenerator(int cellSize) {
+        this.cellSize = cellSize;
+    }
+
     @Override
-    public Room[][] generate(int cellSize) {
+    public Room[][] generate() {
         dungeon = new Room[cellSize][cellSize];
         this.cellSize = cellSize;
         setStartingPosition();
@@ -36,6 +40,9 @@ public class StepByStepDungeonGenerator implements DungeonGenerator {
         startingPosition[0] = random.nextInt(cellSize - ((cellSize / 5) * 2)) + (cellSize / 5);
         startingPosition[1] = random.nextInt(cellSize - ((cellSize / 5) * 2)) + (cellSize / 5);
     }
+
+    @Override
+    public int getCellSize() { return cellSize; }
 
     private void stepUntil(int maxStep) {
         int x = startingPosition[0];

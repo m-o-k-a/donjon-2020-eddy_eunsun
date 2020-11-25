@@ -11,8 +11,12 @@ public class NeverEndingDungeonGenerator implements DungeonGenerator {
     private Integer[] startingPosition;
     private int cellSize;
 
+    public NeverEndingDungeonGenerator(int cellSize) {
+        this.cellSize = cellSize;
+    }
+
     @Override
-    public Room[][] generate(int cellSize) {
+    public Room[][] generate() {
         dungeon = new Room[cellSize][cellSize];
         this.cellSize = cellSize;
         for(int width = 0; width<cellSize; width++) {
@@ -44,6 +48,9 @@ public class NeverEndingDungeonGenerator implements DungeonGenerator {
         } while(dungeon[x][y] != null && (dungeon[x][y] instanceof Wall));
         startingPosition[0] = x; startingPosition[1] = y;
     }
+
+    @Override
+    public int getCellSize() { return cellSize; }
 
     private boolean isWall(int chance) {
         int value = random.nextInt(101);

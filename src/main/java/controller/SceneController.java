@@ -23,11 +23,10 @@ import java.util.ResourceBundle;
 public class SceneController implements Initializable {
 
     private EntityFactory entityFactory = new EntityFactory();
-    private DungeonGenerator dungeonGenerator = new EnhancedStepByStepDungeonGenerator();
+    private DungeonGenerator dungeonGenerator = new EnhancedStepByStepDungeonGenerator(50);
     private DifficultyStrategy difficultyStrategy;
     private Dungeon dungeon;
     private Player player;
-    private int cellSize;
 
     @FXML private TextFlow textLogsContent;
     @FXML private Pane lifebar;
@@ -51,8 +50,7 @@ public class SceneController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        cellSize = 50; //pls do not go above 50
-        dungeon = new Dungeon(dungeonGenerator.generate(cellSize));
+        dungeon = new Dungeon(dungeonGenerator.generate());
         difficultyStrategy = new SimpleDifficultyEnhance();
 
         Integer[] position = dungeonGenerator.getStartingPosition();
@@ -62,7 +60,7 @@ public class SceneController implements Initializable {
         lifebar.getChildren().add(playerLife);
         if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) { difficultyStrategy.doUpdateDifficulty(); }
 
-        drawMiniMap = new MiniMap(minimap, player, dungeon, cellSize);
+        drawMiniMap = new MiniMap(minimap, player, dungeon, dungeonGenerator.getCellSize());
         drawLifeBar = new LifeBar(playerLife, player, lifebar.getPrefWidth());
         drawChest = new ChestDrawable(spriteChest);
         drawMonster = new MonsterDrawable(spriteMonster, scene);
