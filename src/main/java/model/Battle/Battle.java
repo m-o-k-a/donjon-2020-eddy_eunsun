@@ -42,6 +42,7 @@ public class Battle {
                 break;
             case ITEM:
                 UsableItem item = player.getInventory().getUsableItem();
+                if(item == null) { return playerLog; }
                 if(item.getDamages() < 0) {
                     updatePlayerHealth(player, item.getDamages());
                     playerLog = new Text("Thou didst heal yourself using a "+item.toString()+"\n");
@@ -53,6 +54,7 @@ public class Battle {
                 break;
             case MAGIC:
                 Magic magic = player.getInventory().getMagic();
+                if(magic == null) { return playerLog; }
                 if(magic.getDamages() < 0) {
                     updatePlayerHealth(player, magic.getDamages());
                     playerLog = new Text("Thou read the incantation in the "+player.getInventory().getMagic().getDamages()+" and healed thyself\n");
