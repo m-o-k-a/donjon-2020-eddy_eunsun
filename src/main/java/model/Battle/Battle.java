@@ -22,7 +22,7 @@ public class Battle {
         if(monster.isDead()) { battleLogs[1] = new Text("The "+monster.type()+" is defeated\n"); }
         else {
             battleLogs[1] = monsterTurn(monsterAction);
-            if(player.isDead()) { battleLogs[2] = new Text("<GAME OVER>\n<PRESS INTERACT TO GO BACK TO TITLE SCREEN>\nThe "+monster.type()+" hast killed thee\n"); }
+            if(player.isDead()) { battleLogs[2] = new Text("<GAME OVER>\n<PRESS INTERACT TO GO BACK TO QUIT>\nThe "+monster.type()+" hast killed thee\n"); }
         }
         return battleLogs;
     }

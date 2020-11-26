@@ -167,7 +167,7 @@ public class SceneController implements Initializable {
         if (getPlayerRoom(player) instanceof ExitRoom) {
             dungeon.setIsExited(true);
             drawLogs.addLogs(Color.GOLD, new Text("<VICTORY>\nThou succeed to exit the dungeon !\n" +
-                    "as a reward thou treat thyself with a whole Schwarzwälder Kirschtorte\n<PRESS INTERACT TO GO BACK TO TITLE SCREEN>\n"));
+                    "as a reward thou treat thyself with a whole Schwarzwälder Kirschtorte\n<PRESS INTERACT TO QUIT\n"));
         }
         else if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) {
             difficultyStrategy.doUpdateDifficulty();
