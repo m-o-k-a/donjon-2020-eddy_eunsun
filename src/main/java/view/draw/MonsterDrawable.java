@@ -4,7 +4,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import model.DataBase.MonsterDataBase;
-import model.Entity.Chest;
 import model.Entity.Monster;
 
 public class MonsterDrawable implements Drawable {

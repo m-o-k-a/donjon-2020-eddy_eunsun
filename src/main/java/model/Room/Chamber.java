@@ -50,12 +50,10 @@ public class Chamber implements  Room {
     private void fillChamber() {
         if(random.nextInt(101)%5 == 0) { monster = MonsterDataBase.generateMonster(difficulty); }
         if(random.nextInt(101)%3 == 0) {
-            //todo generate lot of possibilities
             int randomItem = random.nextInt(3);
             Chest newChest = null;
             if(randomItem == 0) { newChest = new Chest(ItemDataBase.generateWeapon(difficulty)); }
             else if(randomItem == 1) { newChest = new Chest(ItemDataBase.generateUsableItem(difficulty)); }
-            //todo if healing item or magic negative dammages
             else if(randomItem == 2) { newChest = new Chest(ItemDataBase.generateMagic(difficulty)); }
             chest = newChest;
         }

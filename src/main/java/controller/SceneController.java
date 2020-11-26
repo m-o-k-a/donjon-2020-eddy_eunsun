@@ -23,8 +23,9 @@ import java.util.ResourceBundle;
 public class SceneController implements Initializable {
 
     private EntityFactory entityFactory = new EntityFactory();
-    private DungeonGenerator dungeonGenerator = new EnhancedStepByStepDungeonGenerator(50);
-    private DifficultyStrategy difficultyStrategy;
+    //20 = nb de cellules du donjon (20*20), reduire la taille pour simplifier, ne pas aller au dessus de 60.
+    private final DifficultyStrategy difficultyStrategy = new SimpleDifficultyEnhance(1, 20);
+    private final DungeonGenerator dungeonGenerator = new EnhancedStepByStepDungeonGenerator(difficultyStrategy.getCellSize());
     private Dungeon dungeon;
     private Player player;
 
@@ -51,9 +52,9 @@ public class SceneController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         dungeon = new Dungeon(dungeonGenerator.generate());
-        difficultyStrategy = new SimpleDifficultyEnhance();
 
         Integer[] position = dungeonGenerator.getStartingPosition();
+        //stats du personage
         player = entityFactory.createPlayer(position[0], position[1], 1000, 10, "Adventurer");
 
         Rectangle playerLife = new Rectangle(lifebar.getPrefWidth(), lifebar.getPrefHeight(), Color.LIME);
@@ -167,7 +168,7 @@ public class SceneController implements Initializable {
         if (getPlayerRoom(player) instanceof ExitRoom) {
             dungeon.setIsExited(true);
             drawLogs.addLogs(Color.GOLD, new Text("<VICTORY>\nThou succeed to exit the dungeon !\n" +
-                    "as a reward thou treat yourself with a whole Schwarzwälder Kirschtorte\n<PRESS INTERACT TO GO BACK TO TITLE SCREEN>\n"));
+                    "as a reward thou treat thyself with a whole Schwarzwälder Kirschtorte\n<PRESS INTERACT TO GO BACK TO TITLE SCREEN>\n"));
         }
         else if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) {
             difficultyStrategy.doUpdateDifficulty();

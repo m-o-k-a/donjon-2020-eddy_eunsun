@@ -1,7 +1,13 @@
 package model.Difficulty;
 
 public class SimpleDifficultyEnhance implements DifficultyStrategy {
-    private int difficulty = 1;
+    private int difficulty;
+    private int cellSize;
+
+    public SimpleDifficultyEnhance(int difficulty, int cellSize) {
+        this.difficulty = difficulty;
+        this.cellSize = cellSize;
+    }
 
     @Override
     public void doUpdateDifficulty() {
@@ -12,4 +18,7 @@ public class SimpleDifficultyEnhance implements DifficultyStrategy {
     public int getDifficulty() {
         return difficulty;
     }
+
+    @Override
+    public int getCellSize() { return cellSize; }
 }

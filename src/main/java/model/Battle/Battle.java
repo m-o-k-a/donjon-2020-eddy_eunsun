@@ -69,6 +69,7 @@ public class Battle {
 
     private Text monsterTurn(ActionDataBase.Action monsterAction) {
         Text monsterLog = new Text("The "+monster.type()+" didst something yond humans cannot understand\n");
+        //implements other monster action depending of monsters action pools
         switch (monsterAction) {
             case ATTACK:
                 int damages = updatePlayerHealth(player, monster.getStrength());
