@@ -59,7 +59,6 @@ public class SceneController implements Initializable {
 
         Rectangle playerLife = new Rectangle(lifebar.getPrefWidth(), lifebar.getPrefHeight(), Color.LIME);
         lifebar.getChildren().add(playerLife);
-        if(((Chamber) getPlayerRoom(player)).InitializeRoom(difficultyStrategy.getDifficulty())) { difficultyStrategy.doUpdateDifficulty(); }
 
         drawMiniMap = new MiniMap(minimap, player, dungeon, dungeonGenerator.getCellSize());
         drawLifeBar = new LifeBar(playerLife, player, lifebar.getPrefWidth());

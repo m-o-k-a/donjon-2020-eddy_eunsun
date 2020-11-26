@@ -29,10 +29,6 @@
      -fx-background-image: url("./ressources/character-paladin.png");
 }
 
-.scene {
-    -fx-background-image: url("./ressources/room-011.jpg");
-}
-
 .minimap {
     -fx-background-color: rgba(0,0,0,0.75);
 }
