@@ -39,7 +39,6 @@ public class MiniMap implements Drawable {
                 }
                 drawMiniMapCell(minimap, color, cellSize, width, height);
                 drawWalls(dungeon, player.x, player.y);
-                drawExit(dungeon, player.x, player.y);
             }
         }
     }
@@ -49,15 +48,13 @@ public class MiniMap implements Drawable {
         for(int width = 0; width<roomSize; width++) {
             for(int height = 0; height<roomSize; height++) {
                 if(dungeon.getRoom(width, height) instanceof Chamber) {
-                    if(((Chamber) dungeon.getRoom(width, height)).isVisited) {
-                        drawMiniMapCell(minimap, Color.GRAY, cellSize, width, height);
-                    }
+                    if(((Chamber) dungeon.getRoom(width, height)).isVisited) { drawMiniMapCell(minimap, Color.GRAY, cellSize, width, height); }
                 }
+                else if(dungeon.getRoom(width, height) instanceof ExitRoom) { drawMiniMapCell(minimap, Color.GOLD, cellSize, width, height); }
             }
         }
         drawMiniMapCell(minimap, Color.LIME, cellSize, player.x, player.y);
         drawWalls(dungeon, player.x, player.y);
-        drawExit(dungeon, player.x, player.y);
     }
 
     private void drawMiniMapCell(Canvas minimap,Color color, int cellSize, int width, int height) {
@@ -80,11 +77,4 @@ public class MiniMap implements Drawable {
         }
     }
 
-    private void drawExit(Dungeon dungeon, int x, int y) {
-        if(dungeon.getRoom(x, y) instanceof ExitRoom) return;
-        if(dungeon.getRoom(x-1, y) instanceof ExitRoom) { drawMiniMapCell(minimap, Color.GOLD, (int)(minimap.getWidth()/cellSize), x-1, y);}
-        else if(dungeon.getRoom(x, y-1) instanceof ExitRoom) { drawMiniMapCell(minimap, Color.GOLD, (int)(minimap.getWidth()/cellSize), x, y-1);}
-        else if(dungeon.getRoom(x+1, y) instanceof ExitRoom) { drawMiniMapCell(minimap, Color.GOLD, (int)(minimap.getWidth()/cellSize), x+1, y);}
-        else if(dungeon.getRoom(x, y+1) instanceof ExitRoom) { drawMiniMapCell(minimap, Color.GOLD, (int)(minimap.getWidth()/cellSize), x, y+1);}
-    }
 }

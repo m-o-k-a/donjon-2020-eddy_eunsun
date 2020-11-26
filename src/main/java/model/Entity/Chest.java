@@ -6,7 +6,7 @@ import model.Item.Magic;
 import model.Item.UsableItem;
 import model.Item.Weapon;
 
-public class Chest implements Entity {
+public class Chest {
     private Item item;
     private boolean isOpened;
 

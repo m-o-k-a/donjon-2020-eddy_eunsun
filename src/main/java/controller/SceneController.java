@@ -74,15 +74,13 @@ public class SceneController implements Initializable {
     private void update() {
         updateMonster(player.x, player.y);
         updateChest(player.x, player.y);
-        updateMiniMap();
         updateDungeon();
         updateLifeBar();
         updateInventoryInfo();
+        updateMiniMap();
     }
 
-    private void updateMiniMap() {
-        drawMiniMap.draw();
-    }
+    private void updateMiniMap() { drawMiniMap.draw(); }
     private void updateLifeBar() { drawLifeBar.draw(); }
     private void updateInventoryInfo() { inventoryInfo.draw(); }
     private void updateDungeon() {

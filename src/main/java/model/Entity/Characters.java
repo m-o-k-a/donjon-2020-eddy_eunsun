@@ -1,6 +1,6 @@
 package model.Entity;
 
-public abstract class Characters implements Entity {
+public abstract class Characters { //todo rename class
     private int health;
     private int maxHealth;
     private int strength;
